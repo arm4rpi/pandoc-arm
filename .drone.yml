@@ -6,4 +6,4 @@ steps:
   image: ann17/pandoc-haskell-aarch64
   commands:
   - pwd
-  - ls
+  - ls /root
