@@ -5,5 +5,5 @@ steps:
 - name: build
   image: ann17/pandoc-haskell-aarch64
   commands:
-  - pwd
-  - ls /root
+  - ./chroot.sh
+  - ls /root/rootfs
