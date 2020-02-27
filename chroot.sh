@@ -7,4 +7,6 @@ mount -t sysfs sysfs sys
 mount -t tmpfs tmpfs tmp
 mount -t proc proc proc
 
+df -h
+
 chroot . ./init.sh
