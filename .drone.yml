@@ -7,5 +7,4 @@ steps:
   privileged: true
   commands:
   - cat /version
-  - ls /usr/bin/qemu-*
   - ./chroot.sh
