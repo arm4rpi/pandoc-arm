@@ -1,30 +1,9 @@
 kind: pipeline
-name: pandoc-arm
-
-platform:
-  os: linux
-  arch: arm
+name: pandoc-aarch64
 
 steps:
-- name: uname
-  image: alpine
+- name: build
+  image: ann17/pandoc-haskell-aarch64
   commands:
-  - uname -a
-
-- name: en
-  image: alpine
-  commands:
-  - echo hello
-  - echo world
-
-- name: es
-  image: alpine
-  commands:
-  - echo hola
-  - echo mundo
-
-- name: fr
-  image: alpine
-  commands:
-  - echo bonjour
-  - echo monde
+  - pwd
+  - ls
