@@ -8,3 +8,10 @@ steps:
   commands:
   - cat /version
   - ./chroot.sh
+
+- name: armv7
+  image: ann17/pandoc-haskell-armv7
+  privileged: true
+  commands:
+  - cat /version
+  - ./chroot.sh
