@@ -1,8 +1,8 @@
 kind: pipeline
-name: pandoc-aarch64
+name: pandoc-arm
 
 steps:
-- name: build
+- name: aarch64
   image: ann17/pandoc-haskell-aarch64
   privileged: true
   commands:
