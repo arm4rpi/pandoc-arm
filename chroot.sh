@@ -1,6 +1,7 @@
 #!/bin/bash
 
 
+cp build.sh /root/rootfs
 cd /root/rootfs
 
 cp /etc/resolv.conf etc
@@ -13,4 +14,4 @@ mount -t sysfs sysfs sys
 mount -t tmpfs tmpfs tmp
 mount -t proc proc proc
 
-chroot . ./init.sh
+chroot . /build.sh
