@@ -23,7 +23,6 @@ cd /root
 git clone https://github.com/jgm/pandoc
 cd pandoc
 tag=`getTag`
-git checkout $tag
 sed -i 's/^resolver.*/resolver: lts-14.6/' stack.yaml
 cat >> stack.yaml <<EOF
 system-ghc: true
@@ -31,14 +30,13 @@ arch: $ARCH
 EOF
 
 stack install -v --flag 'pandoc:static'
-release pandoc
+release pandoc "$tag"
 
 # pandoc-citeproc
 cd ../
 git clone https://github.com/jgm/pandoc-citeproc
 cd pandoc-citeproc
 tag=`getTag`
-git checkout $tag
 sed -i 's/^resolver.*/resolver: lts-14.6/' stack.yaml
 cat >> stack.yaml <<EOF
 system-ghc: true
@@ -46,14 +44,13 @@ arch: $ARCH
 EOF
 
 stack install -v --flag 'pandoc-citeproc:static'
-release "pandoc-citeproc"
+release "pandoc-citeproc" "$tag"
 
 # pandoc-crossref
 cd ../
 git clone https://github.com/lierdakil/pandoc-crossref
 cd pandoc-crossref
 tag=`getTag`
-git checkout $tag
 sed -i 's/^resolver.*/resolver: lts-14.6/' stack.yaml
 cat >> stack.yaml <<EOF
 system-ghc: true
@@ -61,6 +58,6 @@ arch: $ARCH
 EOF
 
 stack install -v
-release "pandoc-crossref"
+release "pandoc-crossref" "$tag"
 
 exit $?
