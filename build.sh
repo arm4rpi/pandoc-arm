@@ -10,9 +10,12 @@ apk add xz git aria2
 cd /root
 /root/stack.sh
 
-git clone github.com/jgm/pandoc
+RESOLVER="nightly-2018-12-17"
+[ "$ARCH"x != "aarch64"x ] && RESOLVER="lts-13.11"
+
+git clone https://github.com/jgm/pandoc
 cd pandoc
-sed 's/^resolver.*/resolver: nightly-2018-12-17/' stack.yaml -i
+sed -i "s/^resolver.*/resolver: $RESOLVER/" stack.yaml
 cat >> stack.yaml <<EOF
 system-ghc: true
 arch: $ARCH
