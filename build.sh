@@ -3,6 +3,7 @@ set -e
 
 ARCH=`arch`
 
+sed -i '/edge/d' /etc/apk/repositories
 apk update
 apk add xz git aria2
 
