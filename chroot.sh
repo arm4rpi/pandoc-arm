@@ -1,10 +1,12 @@
 #!/bin/bash
 
+set -e
 
 cp build.sh /ghc/rootfs
 cd /ghc/rootfs
 
 cp /etc/resolv.conf etc
+apt-get update
 apt-get install -y qemu-user-static
 cp /usr/bin/qemu-aarch64-static usr/bin
 
