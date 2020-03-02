@@ -7,3 +7,8 @@ steps:
   privileged: true
   commands:
   - ./chroot.sh
+- name: arm
+  image: ann17/pandoc-ghc-arm
+  privileged: true
+  commands:
+  - ./chroot.sh
