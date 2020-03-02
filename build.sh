@@ -1,5 +1,4 @@
 #!/bin/bash
-set -e
 
 ARCH=`arch`
 
@@ -26,6 +25,7 @@ cd /root
 /root/stack.sh
 
 if [ "$CODE"x == "CN"x ];then
+	[ ! -d /root/.stack ] && mkdir /root/.stack
 	cat >> /root/.stack/config.yaml <<EOF
 package-indices:
   - download-prefix: http://mirrors.tuna.tsinghua.edu.cn/hackage/
@@ -47,9 +47,10 @@ package-indices:
 EOF
 fi
 
-# pandoc
-git clone https://github.com/jgm/pandoc
-cd pandoc
+# pandoc-crossref
+cd ../
+git clone https://github.com/lierdakil/pandoc-crossref
+cd pandoc-crossref
 tag=`getTag`
 sed -i 's/^resolver.*/resolver: lts-14.6/' stack.yaml
 cat >> stack.yaml <<EOF
@@ -57,8 +58,8 @@ system-ghc: true
 arch: $ARCH
 EOF
 
-stack install -v --flag 'pandoc:static'
-release pandoc "$tag"
+stack install -vv
+release "pandoc-crossref" "$tag"
 
 # pandoc-citeproc
 cd ../
@@ -71,13 +72,12 @@ system-ghc: true
 arch: $ARCH
 EOF
 
-stack install -v --flag 'pandoc-citeproc:static'
+stack install -vv --flag 'pandoc-citeproc:static'
 release "pandoc-citeproc" "$tag"
 
-# pandoc-crossref
-cd ../
-git clone https://github.com/lierdakil/pandoc-crossref
-cd pandoc-crossref
+# pandoc
+git clone https://github.com/jgm/pandoc
+cd pandoc
 tag=`getTag`
 sed -i 's/^resolver.*/resolver: lts-14.6/' stack.yaml
 cat >> stack.yaml <<EOF
@@ -85,7 +85,6 @@ system-ghc: true
 arch: $ARCH
 EOF
 
-stack install -v
-release "pandoc-crossref" "$tag"
+stack install -vv --flag 'pandoc:static'
+release pandoc "$tag"
 
-exit $?
