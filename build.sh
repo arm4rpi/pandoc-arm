@@ -4,7 +4,7 @@ set -e
 ARCH=`arch`
 
 apk update
-apk add xz
+apk add xz git aria2
 
 cd /root
 /root/stack.sh
