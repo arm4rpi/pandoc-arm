@@ -1,8 +1,8 @@
 #!/bin/bash
 
 
-cp build.sh /root/rootfs
-cd /root/rootfs
+cp build.sh /ghc/rootfs
+cd /ghc/rootfs
 
 cp /etc/resolv.conf etc
 apt-get install -y qemu-user-static

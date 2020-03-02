@@ -3,15 +3,7 @@ name: pandoc-arm
 
 steps:
 - name: aarch64
-  image: ann17/pandoc-haskell-aarch64
+  image: ann17/pandoc-ghc-aarch64
   privileged: true
   commands:
-  - cat /version
-  - ./chroot.sh
-
-- name: armv7
-  image: ann17/pandoc-haskell-armv7
-  privileged: true
-  commands:
-  - cat /version
   - ./chroot.sh
