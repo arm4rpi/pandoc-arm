@@ -30,6 +30,9 @@ hslua-module-system must match >=0.2 && <0.3, but the stack configuration has no
 version (latest matching version is 0.2.1)
 ipynb must match >=0.1 && <0.2, but the stack configuration has no specified version (latest
 matching version is 0.1)
+hslua-1.0.1 from stack configuration does not match >=1.0.3 && <1.2 (latest matching version
+is 1.0.3.2)
+needed due to pandoc-2.9.2 -> hslua-module-system-0.2.1
 needed since pandoc is a build target.
 Some different approaches to resolving this:
 * Recommended action: try adding the following to your extra-deps in /root/pandoc/stack.yaml:
@@ -38,7 +41,7 @@ Some different approaches to resolving this:
 - ipynb-0.1@sha256:5b5240a9793781da557f82891d49cea63d71c8c5d3500fa3eac9fd702046b520,1926
 COMMENT
 
-sed -i 's/extra-deps:/extra-deps:\n- cmark-gfm-0.2.1@sha256:f49c10f6f1f8f41cb5d47e69ad6593dc45d2b28a083bbe22926d9f5bebf479b5,5191\n- hslua-module-system-0.2.1@sha256:7c498e51df885be5fd9abe9b762372ff4f125002824d8e11a7d5832154a7a1c3,2216\n- ipynb-0.1@sha256:5b5240a9793781da557f82891d49cea63d71c8c5d3500fa3eac9fd702046b520,1926/g' stack.yaml
+sed -i 's/extra-deps:/extra-deps:\n- cmark-gfm-0.2.1@sha256:f49c10f6f1f8f41cb5d47e69ad6593dc45d2b28a083bbe22926d9f5bebf479b5,5191\n- hslua-module-system-0.2.1@sha256:7c498e51df885be5fd9abe9b762372ff4f125002824d8e11a7d5832154a7a1c3,2216\n- ipynb-0.1@sha256:5b5240a9793781da557f82891d49cea63d71c8c5d3500fa3eac9fd702046b520,1926\n- hslua-1.0.3.2@sha256:8db3f80f52e8382c3ec6801742a13649cc2bf82cf55b6ac288a47512a6cc3b33,9685/g' stack.yaml
 
 stack install -v --flag 'pandoc:static'
 
