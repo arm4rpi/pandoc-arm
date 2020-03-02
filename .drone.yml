@@ -12,3 +12,16 @@ steps:
   privileged: true
   commands:
   - ./chroot.sh
+
+- name: release
+  image: plugins/github-release
+  settings:
+    api_key:
+      from_secret: github_token
+    files: /root/.local/bin/*
+  checksum:
+  - sha1
+  - md5
+  when:
+    event: tag
+    
