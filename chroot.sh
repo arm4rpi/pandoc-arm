@@ -2,13 +2,14 @@
 
 set -e
 
-BINDIR=/drone/src/bin
+CUR=$(cd `dirname $0`;pwd)
+BINDIR=$CUR/bin
 [ ! -d $BINDIR ] && mkdir -p $BINDIR
 
 ARCH=aarch64
 [ "$1"x == "arm"x ] && ARCH=arm
 
-cp build.sh /ghc/rootfs
+cp $CUR/build.sh /ghc/rootfs
 cd /ghc/rootfs
 
 cp /etc/resolv.conf etc
