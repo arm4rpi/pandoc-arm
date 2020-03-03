@@ -11,7 +11,7 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: chroot
-      run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-arm:latest /drone/src/chroot.sh arm
+      run: docker run -it --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-arm:latest /drone/src/chroot.sh arm
 
   aarch64:
 
@@ -20,4 +20,4 @@ jobs:
     steps:
     - uses: actions/checkout@v2
     - name: chroot
-      run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-aarch64:latest /drone/src/chroot.sh
+      run: docker run -it --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-aarch64:latest /drone/src/chroot.sh
