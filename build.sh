@@ -41,7 +41,6 @@ EOF
 fi
 
 # pandoc-crossref
-cd ../
 git clone https://github.com/lierdakil/pandoc-crossref
 cd pandoc-crossref
 tag=`getTag`
@@ -69,6 +68,7 @@ stack install -v --cabal-verbose --flag 'pandoc-citeproc:static'
 release "pandoc-citeproc" "$tag"
 
 # pandoc
+cd ../
 git clone https://github.com/jgm/pandoc
 cd pandoc
 tag=`getTag`
