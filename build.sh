@@ -4,6 +4,9 @@ set -e
 
 ARCH=`arch`
 
+# stack did not no armhf or armv7l
+[ "$ARCH"x != "aarch64"x ] && ARCH="arm"
+
 function getTag() {
 	git describe --tags |awk -F'-' '{print $1}'
 }
