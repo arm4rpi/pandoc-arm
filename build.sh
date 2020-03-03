@@ -14,13 +14,8 @@ function release() {
 	xz $DIR/$1-$2-$ARCH
 }
 
-CODE=`curl -s http://ip-api.com/json |tr ',' '\n' |grep "countryCode" |awk -F'"' '{print $4}'`
-
-if [ "$CODE"x == "CN"x ];then
-	sed -i 's/ports.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list
-fi
-
 cd /root
+CODE=`curl -s http://ip-api.com/json |tr ',' '\n' |grep "countryCode" |awk -F'"' '{print $4}'`
 
 if [ "$CODE"x == "CN"x ];then
 	[ ! -d /root/.stack ] && mkdir /root/.stack
