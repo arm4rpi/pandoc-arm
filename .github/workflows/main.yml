@@ -1,0 +1,23 @@
+name: Pandoc Arm
+
+on: [push]
+
+jobs:
+
+  armv7l:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: chroot
+      run: ./chroot.sh arm
+
+  aarch64:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: chroot
+      run: ./chroot.sh
