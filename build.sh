@@ -22,7 +22,6 @@ apt-get update
 apt-get install -y xz-utils
 
 cd /root
-/root/stack.sh
 
 if [ "$CODE"x == "CN"x ];then
 	[ ! -d /root/.stack ] && mkdir /root/.stack

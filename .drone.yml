@@ -2,13 +2,13 @@ kind: pipeline
 name: pandoc-arm
 
 steps:
-- name: aarch64
-  image: ann17/pandoc-ghc-aarch64
+- name: arm
+  image: ann17/pandoc-ghc-arm
   privileged: true
   commands:
   - ./chroot.sh
-- name: arm
-  image: ann17/pandoc-ghc-arm
+- name: aarch64
+  image: ann17/pandoc-ghc-aarch64
   privileged: true
   commands:
   - ./chroot.sh
