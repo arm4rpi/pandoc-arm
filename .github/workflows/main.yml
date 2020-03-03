@@ -4,20 +4,13 @@ on: [push]
 
 jobs:
 
-  armv7l:
+  build:
 
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
-    - name: chroot
+    - name: armv7l
       run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-arm:latest /drone/src/chroot.sh arm
-
-  aarch64:
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: chroot
+    - name: aarch64
       run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-aarch64:latest /drone/src/chroot.sh
