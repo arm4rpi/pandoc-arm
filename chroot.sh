@@ -14,8 +14,11 @@ cd /ghc/rootfs
 
 cp /etc/resolv.conf etc
 
-apt-get update
-apt-get install -y qemu-user-static
+uname -a |grep azure
+if [ $? -eq 0 ];then
+	apt-get update
+	apt-get --reinstall install -y qemu-user-static
+fi
 
 cp /usr/bin/qemu-$ARCH-static usr/bin
 
