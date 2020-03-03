@@ -4,7 +4,7 @@ on: [push]
 
 jobs:
 
-  build:
+  armv7l:
 
     runs-on: ubuntu-latest
 
@@ -22,5 +22,42 @@ jobs:
       run: docker --version
     - name: armv7l
       run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-arm:latest /drone/src/chroot.sh arm
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@latest
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false      
+
+  aarch64:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Check Docker Version
+      run: docker --version
+    - name: Install Latest Docker
+      run: |
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu  $(lsb_release -cs)  stable"
+        sudo apt-get update
+        sudo apt-get install docker-ce
+    - name: Check Docker Version
+      run: docker --version
     - name: aarch64
       run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-aarch64:latest /drone/src/chroot.sh
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@latest
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false      
