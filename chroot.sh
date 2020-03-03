@@ -22,6 +22,11 @@ mount -t sysfs sysfs sys
 mount -t tmpfs tmpfs tmp
 mount -t proc proc proc
 
+# check container
+ls /ghc/rootfs
+dpkg -l |grep qemu
+ls /ghc/rootfs/usr/bin |grep qemu
+
 chroot . /build.sh
 
 mv /ghc/rootfs/root/bin/* $BINDIR
