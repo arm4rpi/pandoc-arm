@@ -3,7 +3,7 @@
 set -e
 
 BINDIR=/drone/src/bin
-[ ! -d $BINDIR ] && mkdir $BINDIR
+[ ! -d $BINDIR ] && mkdir -p $BINDIR
 
 ARCH=aarch64
 [ "$1"x == "arm"x ] && ARCH=arm
