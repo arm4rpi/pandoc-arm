@@ -2,6 +2,9 @@
 
 set -e
 
+ARCH=aarch64
+[ "$1"x == "arm"x ] && ARCH=arm
+
 cp build.sh /ghc/rootfs
 cd /ghc/rootfs
 
@@ -15,7 +18,7 @@ fi
 
 apt-get update
 apt-get install -y qemu-user-static
-cp /usr/bin/qemu-aarch64-static usr/bin
+cp /usr/bin/qemu-$ARCH-static usr/bin
 
 mount -t devtmpfs devtmpfs dev
 mount -t devpts devpts dev/pts

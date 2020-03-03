@@ -6,7 +6,7 @@ steps:
   image: ann17/pandoc-ghc-arm
   privileged: true
   commands:
-  - ./chroot.sh
+  - ./chroot.sh arm
 - name: aarch64
   image: ann17/pandoc-ghc-aarch64
   privileged: true
