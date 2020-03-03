@@ -20,9 +20,6 @@ if [ "$CODE"x == "CN"x ];then
 	sed -i 's/ports.ubuntu.com/mirrors.aliyun.com/g' /etc/apt/sources.list
 fi
 
-apt-get update
-apt-get install -y xz-utils
-
 cd /root
 
 if [ "$CODE"x == "CN"x ];then
