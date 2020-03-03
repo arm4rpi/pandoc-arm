@@ -2,6 +2,9 @@
 
 set -e
 
+BINDIR=/drone/src/bin
+[ ! -d $BINDIR ] && mkdir $BINDIR
+
 ARCH=aarch64
 [ "$1"x == "arm"x ] && ARCH=arm
 
@@ -19,3 +22,5 @@ mount -t tmpfs tmpfs tmp
 mount -t proc proc proc
 
 chroot . /build.sh
+
+mv /ghc/rootfs/root/bin/* $BINDIR

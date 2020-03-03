@@ -3,7 +3,7 @@
 set -e
 
 ARCH=`arch`
-BINDIR=/drone/src/bin
+BINDIR=/root/bin
 
 [ ! -d $BINDIR ] && mkdir $BINDIR
 
