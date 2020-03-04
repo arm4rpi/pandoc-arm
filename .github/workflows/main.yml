@@ -20,8 +20,8 @@ jobs:
         sudo apt-get install docker-ce
     - name: Check Docker Version
       run: docker --version
-    - name: armv7l
-      run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-arm:cabal-ghc8.6.5 /drone/src/chroot.sh arm
+    - name: build
+      run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-arm:cabal-ghc8.6.5 /drone/src/cabal/chroot.sh arm
     - name: Create Release
       id: create_release
       uses: actions/create-release@latest
@@ -58,8 +58,8 @@ jobs:
         sudo apt-get install docker-ce
     - name: Check Docker Version
       run: docker --version
-    - name: aarch64
-      run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-aarch64:cabal-ghc8.6.5 /drone/src/chroot.sh
+    - name: build
+      run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-aarch64:cabal-ghc8.6.5 /drone/src/cabal/chroot.sh
     - name: Create Release
       id: create_release
       uses: actions/create-release@latest
@@ -96,8 +96,8 @@ jobs:
         sudo apt-get install docker-ce
     - name: Check Docker Version
       run: docker --version
-    - name: aarch64
-      run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-arm:cabal-ghc8.0.2 /drone/src/chroot.sh
+    - name: build
+      run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-arm:cabal-ghc8.0.2 /drone/src/cabal/chroot.sh arm
     - name: Create Release
       id: create_release
       uses: actions/create-release@latest
@@ -134,8 +134,8 @@ jobs:
         sudo apt-get install docker-ce
     - name: Check Docker Version
       run: docker --version
-    - name: aarch64
-      run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-aarch64:cabal-ghc8.0.2 /drone/src/chroot.sh
+    - name: build
+      run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-aarch64:cabal-ghc8.0.2 /drone/src/cabal/chroot.sh
     - name: Create Release
       id: create_release
       uses: actions/create-release@latest
@@ -172,8 +172,8 @@ jobs:
         sudo apt-get install docker-ce
     - name: Check Docker Version
       run: docker --version
-    - name: aarch64
-      run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-arm:stack-ghc8.6.3 /drone/src/chroot.sh
+    - name: build
+      run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-arm:stack-ghc8.6.3 /drone/src/stack/chroot.sh arm
     - name: Create Release
       id: create_release
       uses: actions/create-release@latest
@@ -210,8 +210,8 @@ jobs:
         sudo apt-get install docker-ce
     - name: Check Docker Version
       run: docker --version
-    - name: aarch64
-      run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-aarch64:stack-ghc8.6.2 /drone/src/chroot.sh
+    - name: build
+      run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-aarch64:stack-ghc8.6.2 /drone/src/stack/chroot.sh
     - name: Create Release
       id: create_release
       uses: actions/create-release@latest
