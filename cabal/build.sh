@@ -28,9 +28,9 @@ fi
 
 cabal update
 
-cabal install pandoc --verbose=3 --flags="static embed_data_files -trypandoc" --bindir=$BINDIR
-cabal install pandoc-citeproc --verbose=3 --flags="static embed_data_files bibutils -unicode_collation -test_citeproc -debug" --bindir=$BINDIR
-cabal install pandoc-crossref --verbose=3 --flags="static" --bindir=$BINDIR
+cabal install pandoc --verbose=3 --flags="static embed_data_files -trypandoc" --bindir=$BINDIR -j1
+cabal install pandoc-citeproc --verbose=3 --flags="static embed_data_files bibutils -unicode_collation -test_citeproc -debug" --bindir=$BINDIR -j1
+cabal install pandoc-crossref --verbose=3 --flags="static" --bindir=$BINDIR -j1
 
 tag=`getTag "pandoc"`
 release "pandoc" "$tag"

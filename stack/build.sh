@@ -77,7 +77,7 @@ cat >> stack.yaml <<EOF
 arch: $ARCH
 EOF
 
-stack install -v --cabal-verbose --flag 'pandoc:static' --compiler=$COMPILER
+stack install -v --cabal-verbose --flag 'pandoc:static' -j1
 release pandoc "$tag"
 
 # pandoc-citeproc
@@ -90,7 +90,7 @@ cat >> stack.yaml <<EOF
 arch: $ARCH
 EOF
 
-stack install -v --cabal-verbose --flag 'pandoc-citeproc:static' --compiler=$COMPILER
+stack install -v --cabal-verbose --flag 'pandoc-citeproc:static' -j1
 release "pandoc-citeproc" "$tag"
 
 # pandoc-crossref
@@ -103,6 +103,6 @@ cat >> stack.yaml <<EOF
 arch: $ARCH
 EOF
 
-stack install -v --cabal-verbose --compiler=$COMPILER
+stack install -v --cabal-verbose -j1
 release "pandoc-crossref" "$tag"
 
