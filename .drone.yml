@@ -2,13 +2,33 @@ kind: pipeline
 name: pandoc-arm
 
 steps:
-- name: arm
-  image: ann17/pandoc-ghc-arm
+- name: arm-cabal-ghc865
+  image: ann17/pandoc-ghc-arm:cabal-ghc8.6.5
   privileged: true
   commands:
   - ./chroot.sh arm
-- name: aarch64
-  image: ann17/pandoc-ghc-aarch64
+- name: aarch64-cabal-ghc865
+  image: ann17/pandoc-ghc-aarch64:cabal-ghc8.6.5
+  privileged: true
+  commands:
+  - ./chroot.sh
+- name: arm-cabal-ghc802
+  image: ann17/pandoc-ghc-arm:cabal-ghc8.0.2
+  privileged: true
+  commands:
+  - ./chroot.sh arm
+- name: aarch64-cabal-ghc802
+  image: ann17/pandoc-ghc-aarch64:cabal-ghc8.0.2
+  privileged: true
+  commands:
+  - ./chroot.sh
+- name: arm-stack-ghc863
+  image: ann17/pandoc-ghc-arm:stack-ghc8.6.3
+  privileged: true
+  commands:
+  - ./chroot.sh arm
+- name: aarch64-stack-ghc862
+  image: ann17/pandoc-ghc-aarch64:stack-ghc8.6.2
   privileged: true
   commands:
   - ./chroot.sh
