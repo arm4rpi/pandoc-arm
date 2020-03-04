@@ -67,6 +67,9 @@ COMMENT
 # pandoc
 git clone https://github.com/jgm/pandoc
 cd pandoc
+
+sed -i 's/extra-deps:/extra-deps:\n- cmark-gfm-0.2.1@sha256:f49c10f6f1f8f41cb5d47e69ad6593dc45d2b28a083bbe22926d9f5bebf479b5,5191\n- hslua-module-system-0.2.1@sha256:7c498e51df885be5fd9abe9b762372ff4f125002824d8e11a7d5832154a7a1c3,2216\n- ipynb-0.1@sha256:5b5240a9793781da557f82891d49cea63d71c8c5d3500fa3eac9fd702046b520,1926\n- hslua-1.0.3.2@sha256:8db3f80f52e8382c3ec6801742a13649cc2bf82cf55b6ac288a47512a6cc3b33,9685/g' stack.yaml
+
 tag=`getTag`
 sed -i "s/^resolver.*/resolver: $RESOLVER/" stack.yaml
 cat >> stack.yaml <<EOF
