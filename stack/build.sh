@@ -4,9 +4,10 @@ set -e
 
 ARCH=`arch`
 RESOLVER="nightly-2018-12-17"
+COMPILER="ghc-8.6.2"
 
 # stack did not no armhf or armv7l
-[ "$ARCH"x != "aarch64"x ] && ARCH="arm" && RESOLVER="lts-13.11"
+[ "$ARCH"x != "aarch64"x ] && ARCH="arm" && RESOLVER="lts-13.11" && COMPILER="ghc-8.6.3"
 
 function getTag() {
 	git describe --tags |awk -F'-' '{print $1}'
@@ -73,11 +74,10 @@ sed -i 's/extra-deps:/extra-deps:\n- cmark-gfm-0.2.1@sha256:f49c10f6f1f8f41cb5d4
 tag=`getTag`
 sed -i "s/^resolver.*/resolver: $RESOLVER/" stack.yaml
 cat >> stack.yaml <<EOF
-system-ghc: true
 arch: $ARCH
 EOF
 
-stack install -v --cabal-verbose --flag 'pandoc:static'
+stack install -v --cabal-verbose --flag 'pandoc:static' --compiler=$COMPILER
 release pandoc "$tag"
 
 # pandoc-citeproc
@@ -87,11 +87,10 @@ cd pandoc-citeproc
 tag=`getTag`
 sed -i "s/^resolver.*/resolver: $RESOLVER/" stack.yaml
 cat >> stack.yaml <<EOF
-system-ghc: true
 arch: $ARCH
 EOF
 
-stack install -v --cabal-verbose --flag 'pandoc-citeproc:static'
+stack install -v --cabal-verbose --flag 'pandoc-citeproc:static' --compiler=$COMPILER
 release "pandoc-citeproc" "$tag"
 
 # pandoc-crossref
@@ -101,10 +100,9 @@ cd pandoc-crossref
 tag=`getTag`
 sed -i "s/^resolver.*/resolver: $RESOLVER/" stack.yaml
 cat >> stack.yaml <<EOF
-system-ghc: true
 arch: $ARCH
 EOF
 
-stack install -v --cabal-verbose
+stack install -v --cabal-verbose --compiler=$COMPILER
 release "pandoc-crossref" "$tag"
 
