@@ -4,21 +4,25 @@ name: pandoc-arm
 steps:
 - name: arm-stack-ghc863
   image: ann17/pandoc-ghc-arm:stack-ghc8.6.3
+  pull: always
   privileged: true
   commands:
   - ./stack/chroot.sh arm
 - name: aarch64-stack-ghc862
   image: ann17/pandoc-ghc-aarch64:stack-ghc8.6.2
+  pull: always
   privileged: true
   commands:
   - ./stack/chroot.sh
 - name: arm-cabal-ghc802
   image: ann17/pandoc-ghc-arm:cabal-ghc8.0.2
+  pull: always
   privileged: true
   commands:
   - ./cabal/chroot.sh arm
 - name: aarch64-cabal-ghc802
   image: ann17/pandoc-ghc-aarch64:cabal-ghc8.0.2
+  pull: always
   privileged: true
   commands:
   - ./cabal/chroot.sh
