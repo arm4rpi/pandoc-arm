@@ -2,26 +2,6 @@ kind: pipeline
 name: pandoc-arm
 
 steps:
-- name: arm-cabal-ghc865
-  image: ann17/pandoc-ghc-arm:cabal-ghc8.6.5
-  privileged: true
-  commands:
-  - ./cabal/chroot.sh arm
-- name: aarch64-cabal-ghc865
-  image: ann17/pandoc-ghc-aarch64:cabal-ghc8.6.5
-  privileged: true
-  commands:
-  - ./cabal/chroot.sh
-- name: arm-cabal-ghc802
-  image: ann17/pandoc-ghc-arm:cabal-ghc8.0.2
-  privileged: true
-  commands:
-  - ./cabal/chroot.sh arm
-- name: aarch64-cabal-ghc802
-  image: ann17/pandoc-ghc-aarch64:cabal-ghc8.0.2
-  privileged: true
-  commands:
-  - ./cabal/chroot.sh
 - name: arm-stack-ghc863
   image: ann17/pandoc-ghc-arm:stack-ghc8.6.3
   privileged: true
@@ -32,6 +12,16 @@ steps:
   privileged: true
   commands:
   - ./stack/chroot.sh
+- name: arm-cabal-ghc802
+  image: ann17/pandoc-ghc-arm:cabal-ghc8.0.2
+  privileged: true
+  commands:
+  - ./cabal/chroot.sh arm
+- name: aarch64-cabal-ghc802
+  image: ann17/pandoc-ghc-aarch64:cabal-ghc8.0.2
+  privileged: true
+  commands:
+  - ./cabal/chroot.sh
 
 - name: release
   image: plugins/github-release
