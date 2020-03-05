@@ -39,7 +39,7 @@ jobs:
           xz ${ARTIFACTS}/*
     - uses: actions/upload-artifact@master
       with:
-        name: bin
+        name: pandoc-${GITHUB_REF}-x86_64
         path: bin
 
   aarch64:
@@ -71,7 +71,7 @@ jobs:
           cp rootfs/root/.cabal/bin/* ${ARTIFACTS}/
     - uses: actions/upload-artifact@master
       with:
-        name: bin
+        name: pandoc-${GITHUB_REF}-aarch64
         path: bin
 
   armv7l:
@@ -103,6 +103,6 @@ jobs:
           cp rootfs/root/.cabal/bin/* ${ARTIFACTS}/
     - uses: actions/upload-artifact@master
       with:
-        name: bin
+        name: pandoc-${GITHUB_REF}-armv7l
         path: bin
 
