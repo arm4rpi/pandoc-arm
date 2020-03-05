@@ -30,7 +30,7 @@ jobs:
           strip $HOME/.cabal/bin/pandoc-citeproc
     - name: Install artifact
       run: |
-          export ARTIFACTS=bin/
+          export ARTIFACTS=bin
           mkdir -p ${ARTIFACTS}
           cd pandoc
           export tag=`git describe --tags`
@@ -66,9 +66,9 @@ jobs:
           sudo chroot . /build.sh
           
           cd ../
-          export ARTIFACTS=bin/
+          export ARTIFACTS=bin
           mkdir -p {$ARTIFACTS}
-          cp rootfs/root/.cabal/bin/* ${ARTIFACTS}/
+          cp rootfs/root/.cabal/bin/* ${ARTIFACTS}
     - uses: actions/upload-artifact@master
       with:
         name: pandoc-${GITHUB_REF}-aarch64
@@ -118,9 +118,9 @@ jobs:
           sudo chroot . /build.sh
           
           cd ../
-          export ARTIFACTS=bin/
+          export ARTIFACTS=bin
           mkdir -p {$ARTIFACTS}
-          cp rootfs/root/.cabal/bin/* ${ARTIFACTS}/
+          cp rootfs/root/.cabal/bin/* ${ARTIFACTS}
     - uses: actions/upload-artifact@master
       with:
         name: pandoc-${GITHUB_REF}-armv7l
