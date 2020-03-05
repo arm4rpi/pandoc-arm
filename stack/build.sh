@@ -78,7 +78,7 @@ system-ghc: true
 arch: $ARCH
 EOF
 
-stack install -v --cabal-verbose --flag 'pandoc:static'
+stack install -v --cabal-verbose --flag 'pandoc:static' --flag 'pandoc:embed_data_files'
 release pandoc "$tag"
 
 # pandoc-citeproc
@@ -92,7 +92,7 @@ system-ghc: true
 arch: $ARCH
 EOF
 
-stack install -v --cabal-verbose --flag 'pandoc-citeproc:static'
+stack install -v --cabal-verbose --flag 'pandoc-citeproc:static' --flag 'pandoc-citeproc:embed_data_files'
 release "pandoc-citeproc" "$tag"
 
 # pandoc-crossref
