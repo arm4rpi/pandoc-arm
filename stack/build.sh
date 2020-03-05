@@ -74,10 +74,11 @@ sed -i 's/extra-deps:/extra-deps:\n- cmark-gfm-0.2.1@sha256:f49c10f6f1f8f41cb5d4
 tag=`getTag`
 sed -i "s/^resolver.*/resolver: $RESOLVER/" stack.yaml
 cat >> stack.yaml <<EOF
+system-ghc: true
 arch: $ARCH
 EOF
 
-stack install -v --cabal-verbose --flag 'pandoc:static' -j1
+stack install -v --cabal-verbose --flag 'pandoc:static'
 release pandoc "$tag"
 
 # pandoc-citeproc
@@ -87,10 +88,11 @@ cd pandoc-citeproc
 tag=`getTag`
 sed -i "s/^resolver.*/resolver: $RESOLVER/" stack.yaml
 cat >> stack.yaml <<EOF
+system-ghc: true
 arch: $ARCH
 EOF
 
-stack install -v --cabal-verbose --flag 'pandoc-citeproc:static' -j1
+stack install -v --cabal-verbose --flag 'pandoc-citeproc:static'
 release "pandoc-citeproc" "$tag"
 
 # pandoc-crossref
@@ -100,9 +102,10 @@ cd pandoc-crossref
 tag=`getTag`
 sed -i "s/^resolver.*/resolver: $RESOLVER/" stack.yaml
 cat >> stack.yaml <<EOF
+system-ghc: true
 arch: $ARCH
 EOF
 
-stack install -v --cabal-verbose -j1
+stack install -v --cabal-verbose
 release "pandoc-crossref" "$tag"
 

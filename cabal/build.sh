@@ -8,7 +8,10 @@ BINDIR=/root/bin
 [ ! -d $BINDIR ] && mkdir $BINDIR
 
 function getTag() {
-	cabal info "$1" |grep "Versions available" -A1 |tail -n1 |awk -F',' '{print $NF}' |cut -f1 -d'(' |tr -d ' '
+	cd $1
+	TAG=`git describe --tags`
+	cd ../
+	echo $TAG
 }
 
 function release() {
@@ -26,16 +29,28 @@ if [ "$CODE"x == "CN"x ];then
 	sed -i -r 's/hackage.haskell.org/mirrors.tuna.tsinghua.edu.cn/g' /root/.cabal/config
 fi
 
-cabal update
+git clone https://github.com/jgm/pandoc
+cabal v2-update
+cd pandoc
+cabal v2-build --dependencies-only . pandoc-citeproc
+cd ../
 
-cabal install pandoc --verbose=3 --flags="static embed_data_files -trypandoc" --bindir=$BINDIR -j1
-cabal install pandoc-citeproc --verbose=3 --flags="static embed_data_files bibutils -unicode_collation -test_citeproc -debug" --bindir=$BINDIR -j1
-cabal install pandoc-crossref --verbose=3 --flags="static" --bindir=$BINDIR -j1
+git clone https://github.com/lierdakil/pandoc-crossref
+cd pandodc-crossref
+cabal v2-build --dependencies-only . pandoc-crossref
+cd ../
+
+cd pandoc
+cabal v2-install . pandoc-citeproc --verbose=3 --flags="static embed_data_files bibutils -unicode_collation -test_citeproc -debug" --bindir=$BINDIR
+cd ../
+
+cd pandoc-crossref
+cabal v2-install . pandoc-crossref --verbose=3 --flags="static" --bindir=$BINDIR
+cd ../
+
 
 tag=`getTag "pandoc"`
 release "pandoc" "$tag"
-
-tag=`getTag "pandoc-citeproc"`
 release "pandoc-citeproc" "$tag"
 
 tag=`getTag "pandoc-crossref"`

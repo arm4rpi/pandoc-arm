@@ -3,72 +3,67 @@ name: Pandoc Arm
 on: [push]
 
 jobs:
-  x86_64:
+
+  armv7l-cabal-ghc865:
 
     runs-on: ubuntu-latest
-    steps:
-    - name: Clone Pandoc
-      run: |
-          git clone https://github.com/jgm/pandoc
-    - name: Install recent cabal/ghc
-      run: |
-          sudo add-apt-repository ppa:hvr/ghc
-          sudo apt-get update
-          sudo apt-get install ghc-8.6.5 cabal-install-2.4 xz-utils
-    - name: Install dependencies
-      run: |
-          export PATH=/opt/cabal/bin:/opt/ghc/bin:$PATH
-          cd pandoc
-          cabal v2-update
-          cabal v2-build --dependencies-only . pandoc-citeproc
-    - name: Build
-      run: |
-          export PATH=/opt/cabal/bin:/opt/ghc/bin:$PATH
-          cd pandoc
-          cabal v2-install . pandoc-citeproc
-          strip $HOME/.cabal/bin/pandoc
-          strip $HOME/.cabal/bin/pandoc-citeproc
-    - name: Install artifact
-      run: |
-          export ARTIFACTS=bin
-          mkdir -p ${ARTIFACTS}
-          cd pandoc
-          export tag=`git describe --tags`
-          cp $HOME/.cabal/bin/pandoc ${ARTIFACTS}/pandoc-${tag}-x86_64
-          cp $HOME/.cabal/bin/pandoc-citeproc ${ARTIFACTS}/pandoc-citeproc-${tag}-x86-64
-          xz ${ARTIFACTS}/*
-    - uses: actions/upload-artifact@master
-      with:
-        name: pandoc-${GITHUB_REF}-x86_64
-        path: bin
 
-  aarch64:
-
-    runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: chroot
+    - name: Check Docker Version
+      run: docker --version
+    - name: Install Latest Docker
       run: |
-          sudo apt-get update
-          sudo apt-get install -y qemu-user-static xz-utils
-          mkdir rootfs
-          aria2c -x 16 http://cdimage.ubuntu.com/ubuntu-base/releases/19.10/release/ubuntu-base-19.10-base-arm64.tar.gz --out=ubuntu-aarch64.tar.gz
-          cd rootfs
-          tar xvf ../ubuntu-aarch64.tar.gz
-          cp ../build.sh .
-          cp /usr/bin/qemu-aarch64-static usr/bin
-          cp /etc/resolv.conf etc
-          sudo mount -t devtmpfs devtmpfs dev
-          sudo mount -t devpts devpts dev/pts
-          sudo mount -t sysfs sysfs sys
-          sudo mount -t tmpfs tmpfs tmp
-          sudo mount -t proc proc proc
-          sudo chroot . /build.sh
-          
-          cd ../
-          export ARTIFACTS=bin
-          mkdir -p {$ARTIFACTS}
-          cp rootfs/root/.cabal/bin/* ${ARTIFACTS}
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu  $(lsb_release -cs)  stable"
+        sudo apt-get update
+        sudo apt-get install docker-ce
+    - name: Check Docker Version
+      run: docker --version
+    - name: build
+      run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-arm:cabal-ghc8.6.5 /drone/src/cabal/chroot.sh arm
+    - uses: actions/upload-artifact@master
+      with:
+        name: pandoc-${GITHUB_REF}-armv7l
+        path: bin
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@latest
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false      
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: ./bin/*.xz
+        asset_content_type: application/gzip
+
+  aarch64-cabal-ghc865:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Check Docker Version
+      run: docker --version
+    - name: Install Latest Docker
+      run: |
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu  $(lsb_release -cs)  stable"
+        sudo apt-get update
+        sudo apt-get install docker-ce
+    - name: Check Docker Version
+      run: docker --version
+    - name: build
+      run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-aarch64:cabal-ghc8.6.5 /drone/src/cabal/chroot.sh
     - uses: actions/upload-artifact@master
       with:
         name: pandoc-${GITHUB_REF}-aarch64
@@ -92,40 +87,155 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
         asset_path: ./bin/*.xz
         asset_content_type: application/gzip
-        
 
-  armv7l:
+  armv7l-cabal-ghc802:
 
     runs-on: ubuntu-latest
+
     steps:
     - uses: actions/checkout@v2
-    - name: chroot
+    - name: Check Docker Version
+      run: docker --version
+    - name: Install Latest Docker
       run: |
-          sudo apt-get update
-          sudo apt-get install -y qemu-user-static xz-utils aria2
-          mkdir rootfs
-          aria2c -x 16 http://cdimage.ubuntu.com/ubuntu-base/releases/19.10/release/ubuntu-base-19.10-base-armhf.tar.gz --out=ubuntu-arm.tar.gz
-          cd rootfs
-          tar xvf ../ubuntu-arm.tar.gz
-          cp ../build.sh .
-          cp /usr/bin/qemu-arm-static usr/bin
-          cp /etc/resolv.conf etc
-          sudo mount -t devtmpfs devtmpfs dev
-          sudo mount -t devpts devpts dev/pts
-          sudo mount -t sysfs sysfs sys
-          sudo mount -t tmpfs tmpfs tmp
-          sudo mount -t proc proc proc
-          sudo chroot . /build.sh
-          
-          cd ../
-          export ARTIFACTS=bin
-          mkdir -p {$ARTIFACTS}
-          cp rootfs/root/.cabal/bin/* ${ARTIFACTS}
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu  $(lsb_release -cs)  stable"
+        sudo apt-get update
+        sudo apt-get install docker-ce
+    - name: Check Docker Version
+      run: docker --version
+    - name: build
+      run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-arm:cabal-ghc8.0.2 /drone/src/cabal/chroot.sh arm
     - uses: actions/upload-artifact@master
       with:
-        name: pandoc-${GITHUB_REF}-armv7l
+        name: pandoc-${GITHUB_REF}-armv7l-ghc802
         path: bin
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@latest
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false      
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: ./bin/*.xz
+        asset_content_type: application/gzip
 
+  aarch64-cabal-ghc802:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Check Docker Version
+      run: docker --version
+    - name: Install Latest Docker
+      run: |
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu  $(lsb_release -cs)  stable"
+        sudo apt-get update
+        sudo apt-get install docker-ce
+    - name: Check Docker Version
+      run: docker --version
+    - name: build
+      run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-aarch64:cabal-ghc8.0.2 /drone/src/cabal/chroot.sh
+    - uses: actions/upload-artifact@master
+      with:
+        name: pandoc-${GITHUB_REF}-aarch64-ghc802
+        path: bin
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@latest
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false      
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: ./bin/*.xz
+        asset_content_type: application/gzip
+
+  armv7l-stack-ghc863:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Check Docker Version
+      run: docker --version
+    - name: Install Latest Docker
+      run: |
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu  $(lsb_release -cs)  stable"
+        sudo apt-get update
+        sudo apt-get install docker-ce
+    - name: Check Docker Version
+      run: docker --version
+    - name: build
+      run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-arm:stack-ghc8.6.3 /drone/src/stack/chroot.sh arm
+    - uses: actions/upload-artifact@master
+      with:
+        name: pandoc-${GITHUB_REF}-armv7l-stack
+        path: bin
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@latest
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        draft: false
+        prerelease: false      
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
+        asset_path: ./bin/*.xz
+        asset_content_type: application/gzip
+
+  aarch64-stack-ghc862:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Check Docker Version
+      run: docker --version
+    - name: Install Latest Docker
+      run: |
+        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu  $(lsb_release -cs)  stable"
+        sudo apt-get update
+        sudo apt-get install docker-ce
+    - name: Check Docker Version
+      run: docker --version
+    - name: build
+      run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-aarch64:stack-ghc8.6.2 /drone/src/stack/chroot.sh
+    - uses: actions/upload-artifact@master
+      with:
+        name: pandoc-${GITHUB_REF}-aarch64-stack
+        path: bin
     - name: Create Release
       id: create_release
       uses: actions/create-release@latest
