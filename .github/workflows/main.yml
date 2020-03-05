@@ -10,7 +10,6 @@ jobs:
     - name: Clone Pandoc
       run: |
           git clone https://github.com/jgm/pandoc
-          cd pandoc
     - name: Install recent cabal/ghc
       run: |
           sudo add-apt-repository ppa:hvr/ghc
@@ -19,11 +18,13 @@ jobs:
     - name: Install dependencies
       run: |
           export PATH=/opt/cabal/bin:/opt/ghc/bin:$PATH
+          cd pandoc
           cabal v2-update
           cabal v2-build --dependencies-only . pandoc-citeproc
     - name: Build
       run: |
           export PATH=/opt/cabal/bin:/opt/ghc/bin:$PATH
+          cd pandoc
           cabal v2-install . pandoc-citeproc
           strip $HOME/.cabal/bin/pandoc
           strip $HOME/.cabal/bin/pandoc-citeproc
@@ -31,6 +32,7 @@ jobs:
       run: |
           export ARTIFACTS=bin/
           mkdir -p ${ARTIFACTS}
+          cd pandoc
           export tag=`git describe --tags`
           cp $HOME/.cabal/bin/pandoc ${ARTIFACTS}/pandoc-${tag}-x86_64
           cp $HOME/.cabal/bin/pandoc-citeproc ${ARTIFACTS}/pandoc-citeproc-${tag}-x86-64
@@ -51,11 +53,11 @@ jobs:
           sudo apt-get install -y qemu-user-static xz-utils
           mkdir rootfs
           aria2c -x 16 http://cdimage.ubuntu.com/ubuntu-base/releases/19.10/release/ubuntu-base-19.10-base-arm64.tar.gz --out=ubuntu-aarch64.tar.gz
-          cp build.sh rootfs
-          cp /usr/bin/qemu-aarch64-static rootfs/usr/bin
-          cp /etc/resolv.conf rootfs/etc
           cd rootfs
           tar xvf ../ubuntu-aarch64.tar.gz
+          cp ../build.sh .
+          cp /usr/bin/qemu-aarch64-static usr/bin
+          cp /etc/resolv.conf etc
           sudo mount -t devtmpfs devtmpfs dev
           sudo mount -t devpts devpts dev/pts
           sudo mount -t sysfs sysfs sys
@@ -83,11 +85,11 @@ jobs:
           sudo apt-get install -y qemu-user-static xz-utils aria2
           mkdir rootfs
           aria2c -x 16 http://cdimage.ubuntu.com/ubuntu-base/releases/19.10/release/ubuntu-base-19.10-base-armhf.tar.gz --out=ubuntu-arm.tar.gz
-          cp build.sh rootfs
-          cp /usr/bin/qemu-arm-static rootfs/usr/bin
-          cp /etc/resolv.conf rootfs/etc
           cd rootfs
           tar xvf ../ubuntu-arm.tar.gz
+          cp ../build.sh .
+          cp /usr/bin/qemu-arm-static usr/bin
+          cp /etc/resolv.conf etc
           sudo mount -t devtmpfs devtmpfs dev
           sudo mount -t devpts devpts dev/pts
           sudo mount -t sysfs sysfs sys
