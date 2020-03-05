@@ -189,7 +189,7 @@ jobs:
     - name: Check Docker Version
       run: docker --version
     - name: build
-      run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-aarch64:alpinestack-ghc8.6.2 /drone/src/stack/chroot.sh
+      run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-aarch64:alpinestack-ghc8.6.2 /drone/src/alpine-stack/chroot.sh
     - uses: actions/upload-artifact@master
       with:
         name: pandoc-${GITHUB_REF}-aarch64-alpinestack
