@@ -17,7 +17,7 @@ cabal v2-update
 cabal v2-build --dependencies-only . pandoc-citeproc
 
 # name: Build
-cabal v2-install . pandoc-citeproc
+cabal v2-install -v . pandoc-citeproc
 strip $HOME/.cabal/bin/pandoc
 strip $HOME/.cabal/bin/pandoc-citeproc
 
