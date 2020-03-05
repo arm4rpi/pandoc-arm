@@ -33,18 +33,12 @@ git clone https://github.com/jgm/pandoc
 cabal v2-update
 cd pandoc
 cabal v2-build --dependencies-only . pandoc-citeproc
-cd ../
-
-git clone https://github.com/lierdakil/pandoc-crossref
-cd pandodc-crossref
-cabal v2-build --dependencies-only . pandoc-crossref
-cd ../
-
-cd pandoc
 cabal v2-install . pandoc-citeproc --verbose=3 --flags="static embed_data_files bibutils -unicode_collation -test_citeproc -debug" --bindir=$BINDIR
 cd ../
 
+git clone https://github.com/lierdakil/pandoc-crossref
 cd pandoc-crossref
+cabal v2-build --dependencies-only . pandoc-crossref
 cabal v2-install . pandoc-crossref --verbose=3 --flags="static" --bindir=$BINDIR
 cd ../
 
