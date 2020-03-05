@@ -1,10 +1,12 @@
 #!/bin/bash
 
+apt-get update
+apt-get install -y software-properties-common git xz-utils
+
 # name: Install recent cabal/ghc
 add-apt-repository ppa:hvr/ghc
 apt-get update
-apt-get install -y git xz-utils
-apt-get install -y ghc-8.6.5 cabal-install-2.4 xz-utils
+apt-get install -y ghc-8.6.5 cabal-install-2.4
 
 # name: Clone Pandoc
 git clone https://github.com/jgm/pandoc
