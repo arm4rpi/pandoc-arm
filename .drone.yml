@@ -2,6 +2,12 @@ kind: pipeline
 name: pandoc-arm
 
 steps:
+- name: aarch64-alpinestack-ghc862
+  image: ann17/pandoc-ghc-aarch64:alpinestack-ghc8.6.2
+  pull: always
+  privileged: true
+  commands:
+  - ./alpine-stack/chroot.sh
 - name: arm-cabal-ghc865
   image: ann17/pandoc-ghc-arm:cabal-ghc8.6.5
   pull: always
@@ -14,12 +20,6 @@ steps:
   privileged: true
   commands:
   - ./cabal/chroot.sh
-- name: aarch64-alpinestack-ghc862
-  image: ann17/pandoc-ghc-aarch64:alpinestack-ghc8.6.2
-  pull: always
-  privileged: true
-  commands:
-  - ./alpine-stack/chroot.sh
 
 - name: release
   image: plugins/github-release
