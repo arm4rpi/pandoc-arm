@@ -1,15 +1,17 @@
 #!/bin/bash
 
+# name: Install recent cabal/ghc
+add-apt-repository ppa:hvr/ghc
+apt-get update
+apt-get install -y git xz-utils
+apt-get install -y ghc-8.6.5 cabal-install-2.4 xz-utils
+
 # name: Clone Pandoc
 git clone https://github.com/jgm/pandoc
 cd pandoc
 TAG=`git describe --tags`
 ARCH=`uname -m`
 
-# name: Install recent cabal/ghc
-sudo add-apt-repository ppa:hvr/ghc
-sudo apt-get update
-sudo apt-get install ghc-8.6.5 cabal-install-2.4 xz-utils
 
 # name: Install dependencies
 export PATH=/opt/cabal/bin:/opt/ghc/bin:$PATH
