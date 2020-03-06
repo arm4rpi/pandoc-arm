@@ -4,66 +4,32 @@ on: [push]
 
 jobs:
 
-  armv7l-cabal-ghc865:
-
-    runs-on: ubuntu-latest
-
-    steps:
-    - uses: actions/checkout@v2
-    - name: Check Docker Version
-      run: docker --version
-    - name: Install Latest Docker
-      run: |
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu  $(lsb_release -cs)  stable"
-        sudo apt-get update
-        sudo apt-get install docker-ce
-    - name: Check Docker Version
-      run: docker --version
-    - name: build
-      run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-arm:cabal-ghc8.6.5 /drone/src/cabal/chroot.sh arm
-    - uses: actions/upload-artifact@master
-      with:
-        name: pandoc-${GITHUB_REF}-armv7l
-        path: bin
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@latest
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: false      
-    - name: Upload Release Asset
-      id: upload-release-asset 
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
-        asset_path: ./bin/*.xz
-        asset_content_type: application/gzip
-
   aarch64-cabal-ghc865:
 
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
-    - name: Check Docker Version
-      run: docker --version
-    - name: Install Latest Docker
-      run: |
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu  $(lsb_release -cs)  stable"
-        sudo apt-get update
-        sudo apt-get install docker-ce
-    - name: Check Docker Version
-      run: docker --version
     - name: build
-      run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-aarch64:cabal-ghc8.6.5 /drone/src/cabal/chroot.sh
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y qemu-user-static aria2
+        aria2c -x 16 http://cdimage.ubuntu.com/ubuntu-base/releases/19.10/release/ubuntu-base-19.10-base-arm64.tar.gz
+        mkdir rootfs
+        mkdir bin
+        cd rootfs
+        tar xvf ../ubuntu-base-19.10-base-arm64.tar.gz
+        cp /usr/bin/qemu-aarch64-static usr/bin
+        cp /etc/resolv.conf etc
+        cp ../build.sh .
+        sudo mount -t devtmpfs devtmpfs dev
+        sudo mount -t devpts devpts dev/pts
+        sudo mount -t sysfs sysfs sys
+        sudo mount -t tmpfs tmpfs tmp
+        sudo mount -t proc proc proc
+        chroot . /build.sh
+        mv root/bin/* ../bin
+
     - uses: actions/upload-artifact@master
       with:
         name: pandoc-${GITHUB_REF}-aarch64
@@ -88,27 +54,35 @@ jobs:
         asset_path: ./bin/*.xz
         asset_content_type: application/gzip
 
-  aarch64-alpinestack-ghc862:
+  armv7l-cabal-ghc865:
 
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v2
-    - name: Check Docker Version
-      run: docker --version
-    - name: Install Latest Docker
-      run: |
-        curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
-        sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu  $(lsb_release -cs)  stable"
-        sudo apt-get update
-        sudo apt-get install docker-ce
-    - name: Check Docker Version
-      run: docker --version
     - name: build
-      run: docker run --privileged -v $(pwd):/drone/src ann17/pandoc-ghc-aarch64:alpinestack-ghc8.6.2 /drone/src/alpine-stack/chroot.sh
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y qemu-user-static aria2
+        aria2c -x 16 http://cdimage.ubuntu.com/ubuntu-base/releases/19.10/release/ubuntu-base-19.10-base-armhf.tar.gz
+        mkdir rootfs
+        mkdir bin
+        cd rootfs
+        tar xvf ../ubuntu-base-19.10-base-armhf.tar.gz
+        cp /usr/bin/qemu-arm-static usr/bin
+        cp /etc/resolv.conf etc
+        cp ../build.sh .
+        sudo mount -t devtmpfs devtmpfs dev
+        sudo mount -t devpts devpts dev/pts
+        sudo mount -t sysfs sysfs sys
+        sudo mount -t tmpfs tmpfs tmp
+        sudo mount -t proc proc proc
+        chroot . /build.sh
+        mv root/bin/* ../bin
+
     - uses: actions/upload-artifact@master
       with:
-        name: pandoc-${GITHUB_REF}-aarch64-alpinestack
+        name: pandoc-${GITHUB_REF}-armv7l
         path: bin
     - name: Create Release
       id: create_release
@@ -129,3 +103,4 @@ jobs:
         upload_url: ${{ steps.create_release.outputs.upload_url }} # This pulls from the CREATE RELEASE step above, referencing it's ID to get its outputs object, which include a `upload_url`. See this blog post for more info: https://jasonet.co/posts/new-features-of-github-actions/#passing-data-to-future-steps 
         asset_path: ./bin/*.xz
         asset_content_type: application/gzip
+
