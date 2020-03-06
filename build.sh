@@ -39,23 +39,25 @@ cd pandoc
 cabal v2-build --dependencies-only . pandoc-citeproc
 
 for id in `seq 1 1000`;do
-cabal v2-install . pandoc-citeproc --flags="static embed_data_files bibutils -unicode_collation -test_citeproc -debug" --bindir=$BINDIR
-if [ $? -eq 0 ];then
-	break;
-fi
+	cabal v2-build . pandoc-citeproc --flags="static embed_data_files bibutils -unicode_collation" --bindir=$BINDIR
+	if [ $? -eq 0 ];then
+		break;
+	fi
 done
+find /root -name "pandoc"
+find /root -name "pandoc-citeproc"
 cd ../
 
 git clone https://github.com/lierdakil/pandoc-crossref
 cd pandoc-crossref
-#cabal v2-build --dependencies-only . pandoc-crossref
 
 for id in `seq 1 1000`;do
-cabal v2-install . pandoc-crossref --verbose=3 --flags="static" --bindir=$BINDIR
-if [ $? -eq 0 ];then
-	break;
-fi
+	cabal v2-build . pandoc-crossref --flags="static" --bindir=$BINDIR
+	if [ $? -eq 0 ];then
+		break;
+	fi
 done
+find /root -name "pandoc-crossref"
 cd ../
 
 
