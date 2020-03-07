@@ -1,6 +1,6 @@
 #!/bin/bash
-
-# set -e
+ 
+set -e
 
 ARCH=`arch`
 BINDIR=/root/bin
@@ -35,8 +35,8 @@ fi
 # download deps
 curl "https://raw.githubusercontent.com/arm4rpi/pandoc-deps/master/deps.txt" -o deps.txt
 for dep in `cat deps.txt |grep -vE "#|^$"`;do
+	echo "$ARCH-$id.tar.gz"
 	curl -L -s "https://github.com/arm4rpi/pandoc-deps/releases/download/v0.1/$ARCH-$id.tar.gz" -o $ARCH-$id.tar.gz
-	[ $? -ne 0 ] && echo "Download $ARCH-$id.tar.gz error. exit 1" && exit 1
 	tar zxvf $ARCH-$id.tar.gz
 done
 
@@ -45,26 +45,14 @@ cabal v2-update
 cd pandoc
 
 cabal v2-build --dependencies-only . pandoc-citeproc
-
-for id in `seq 1 1000`;do
-	cabal v2-build . pandoc-citeproc --flags="static embed_data_files bibutils -unicode_collation" --bindir=$BINDIR
-	if [ $? -eq 0 ];then
-		break;
-	fi
-done
+cabal v2-build . pandoc-citeproc --flags="static embed_data_files bibutils -unicode_collation" --bindir=$BINDIR
 find /root -name "pandoc"
 find /root -name "pandoc-citeproc"
 cd ../
 
 git clone https://github.com/lierdakil/pandoc-crossref
 cd pandoc-crossref
-
-for id in `seq 1 1000`;do
-	cabal v2-build . pandoc-crossref --flags="static" --bindir=$BINDIR
-	if [ $? -eq 0 ];then
-		break;
-	fi
-done
+cabal v2-build . pandoc-crossref --flags="static" --bindir=$BINDIR
 find /root -name "pandoc-crossref"
 cd ../
 
