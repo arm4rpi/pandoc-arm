@@ -19,7 +19,7 @@ function getTag() {
 
 function release() {
 	mv $BINDIR/$1 $BINDIR/$1-$2-$ARCH
-	xz $BINDIR/$1-$2-$ARCH
+	tar zcvf $BINDIR/$1-$2-$ARCH.tar.gz $BINDIR/$1-$2-$ARCH
 }
 
 cd /root
@@ -31,6 +31,14 @@ if [ "$CODE"x == "CN"x ];then
 	sed -i -r 's/hackage.haskell.org\//mirrors.tuna.tsinghua.edu.cn\/hackage/g' /root/.cabal/config
 	sed -i -r 's/hackage.haskell.org/mirrors.tuna.tsinghua.edu.cn/g' /root/.cabal/config
 fi
+
+# download deps
+curl "https://raw.githubusercontent.com/arm4rpi/pandoc-deps/master/deps.txt" -o deps.txt
+for dep in `cat deps.txt |grep -vE "#|^$"`;do
+	curl -L -s "https://github.com/arm4rpi/pandoc-deps/releases/download/v0.1/$ARCH-$id.tar.gz" -o $ARCH-$id.tar.gz
+	[ $? -ne 0 ] && echo "Download $ARCH-$id.tar.gz error. exit 1" && exit 1
+	tar zxvf $ARCH-$id.tar.gz
+done
 
 git clone https://github.com/jgm/pandoc
 cabal v2-update
