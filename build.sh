@@ -34,7 +34,7 @@ fi
 
 # download deps
 curl "https://raw.githubusercontent.com/arm4rpi/pandoc-deps/master/deps.txt" -o deps.txt
-for dep in `cat deps.txt |grep -vE "#|^$"`;do
+for id in `cat deps.txt |grep -vE "#|^$"`;do
 	echo "$ARCH-$id.tar.gz"
 	curl -L -s "https://github.com/arm4rpi/pandoc-deps/releases/download/v0.1/$ARCH-$id.tar.gz" -o $ARCH-$id.tar.gz
 	tar zxvf $ARCH-$id.tar.gz
