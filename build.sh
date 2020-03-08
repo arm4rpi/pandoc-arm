@@ -40,6 +40,7 @@ for id in `cat deps.txt |grep -vE "#|^$"`;do
 	curl -L -s "https://github.com/arm4rpi/pandoc-deps/releases/download/v0.1/$ARCH-$id.tar.gz" -o $ARCH-$id.tar.gz
 	tar zxvf $ARCH-$id.tar.gz
 done
+mv home/runner/.cabal/* /home/runner/.cabal
 
 git clone https://github.com/jgm/pandoc
 cd pandoc
