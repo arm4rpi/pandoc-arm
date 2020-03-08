@@ -26,12 +26,13 @@ cd /root
 CODE=`curl -s http://ip-api.com/json |tr ',' '\n' |grep "countryCode" |awk -F'"' '{print $4}'`
 
 cabal user-config init
-cabal v2-update
 
 if [ "$CODE"x == "CN"x ];then
 	sed -i -r 's/hackage.haskell.org\//mirrors.tuna.tsinghua.edu.cn\/hackage/g' /root/.cabal/config
 	sed -i -r 's/hackage.haskell.org/mirrors.tuna.tsinghua.edu.cn/g' /root/.cabal/config
 fi
+
+cabal v2-update
 
 # download deps
 curl "https://raw.githubusercontent.com/arm4rpi/pandoc-deps/master/deps.txt" -o deps.txt
@@ -41,6 +42,7 @@ for id in `cat deps.txt |grep -vE "#|^$"`;do
 	tar zxvf $ARCH-$id.tar.gz
 done
 mv home/runner/.cabal/* /home/runner/.cabal
+ghc-pkg recache -v -f /home/runner/.cabal/store/ghc-8.6.5/package.db/
 
 git clone https://github.com/jgm/pandoc
 cd pandoc
