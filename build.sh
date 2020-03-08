@@ -26,6 +26,7 @@ cd /root
 CODE=`curl -s http://ip-api.com/json |tr ',' '\n' |grep "countryCode" |awk -F'"' '{print $4}'`
 
 cabal user-config init
+cabal v2-update
 
 if [ "$CODE"x == "CN"x ];then
 	sed -i -r 's/hackage.haskell.org\//mirrors.tuna.tsinghua.edu.cn\/hackage/g' /root/.cabal/config
@@ -41,18 +42,17 @@ for id in `cat deps.txt |grep -vE "#|^$"`;do
 done
 
 git clone https://github.com/jgm/pandoc
-cabal v2-update
 cd pandoc
 
-cabal v2-build --dependencies-only . pandoc-citeproc
-cabal v2-build . pandoc-citeproc --flags="static embed_data_files bibutils -unicode_collation" --bindir=$BINDIR
+# cabal v2-build --dependencies-only . pandoc-citeproc
+cabal v2-install . pandoc-citeproc --flags="static embed_data_files bibutils -unicode_collation" --bindir=$BINDIR
 find /root -name "pandoc"
 find /root -name "pandoc-citeproc"
 cd ../
 
 git clone https://github.com/lierdakil/pandoc-crossref
 cd pandoc-crossref
-cabal v2-build . pandoc-crossref --flags="static" --bindir=$BINDIR
+cabal v2-install . pandoc-crossref --flags="static" --bindir=$BINDIR
 find /root -name "pandoc-crossref"
 cd ../
 
