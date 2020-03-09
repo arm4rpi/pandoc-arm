@@ -35,7 +35,7 @@ fi
 cabal v2-update
 
 # download deps
-curl "https://raw.githubusercontent.com/arm4rpi/pandoc-deps/master/deps.txt" -o deps.txt
+curl -k "https://raw.githubusercontent.com/arm4rpi/pandoc-deps/master/deps.txt" -o deps.txt
 for id in `cat deps.txt |grep -vE "#|^$"`;do
 	echo "$ARCH-$id.tar.gz"
 	aria2c -x 16 "https://github.com/arm4rpi/pandoc-deps/releases/download/v0.1/$ARCH-$id.tar.gz"
