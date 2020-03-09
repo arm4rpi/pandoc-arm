@@ -43,12 +43,15 @@ for id in `cat deps.txt |grep -vE "#|^$"`;do
 	aria2c -x 16 "https://github.com/arm4rpi/pandoc-deps/releases/download/v0.1/$ARCH-$id.tar.gz"
 	tar zxvf $ARCH-$id.tar.gz
 done
-mv home/runner/.cabal/* $CABALDIR
 ghc-pkg recache -v -f $CABALDIR/store/ghc-8.6.5/package.db/
 
 cabal v2-install $PKG $FLAGS -v
 
-ls $CABALDIR/store
+echo "ls $CABALDIR/store/ghc-8.6.5"
+ls $CABALDIR/store/ghc-8.6.5
+
+echo "ls $CABALDIR/bin"
+ls $CABALDIR/bin
 
 tar zcvf $ARCH-$PKG.tar.gz $CABALDIR/bin
 echo $PKG |grep -E "pandoc-[1-9]" && tar zcvf $ARCH-lib-$PKG.tar.gz $CABALDIR/store/ghc-8.6.5/$PKG-*
