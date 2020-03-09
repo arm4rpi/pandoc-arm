@@ -7,7 +7,7 @@ PKG=`basename $0`
 CABALDIR="/home/runner/.cabal"
 
 apt-get update
-apt-get install -y cabal-install pkg-config build-essential zlib1g-dev curl aria2
+apt-get install -y cabal-install pkg-config build-essential zlib1g-dev curl aria2 git
 
 CODE=`curl -s http://ip-api.com/json |tr ',' '\n' |grep "countryCode" |awk -F'"' '{print $4}'`
 cabal user-config init
@@ -28,13 +28,10 @@ function libpandoc() {
 		tar zxvf $ARCH-lib-$lib.tar.gz
 	else
 		echo "lib pandoc not exists"
-		exit 1
+		echo "$PKG" |grep -E "pandoc-[1-9]" && echo "build pandoc lib" || exit 1
 	fi
 }
 
-FLAGS='--flags="static embed_data_files"'
-echo "$PKG" |grep "citeproc" && FLAGS='--flags="static embed_data_files bibutils"' && libpandoc
-echo "$PKG" |grep "crossref" && FLAGS='' && libpandoc
 
 # download deps
 curl -k "https://raw.githubusercontent.com/arm4rpi/pandoc-deps/master/deps.txt" -o deps.txt
@@ -45,7 +42,9 @@ for id in `cat deps.txt |grep -vE "#|^$"`;do
 done
 ghc-pkg recache -v -f $CABALDIR/store/ghc-8.6.5/package.db/
 
-cabal v2-install $PKG $FLAGS -v
+echo $PKG |grep "citeproc" && cabal v2-install $PKG -v --flags="static embed_data_files bibutils"
+echo $PKG |grep "crossref" && cabal v2-install $PKG -v
+echo $PKG |grep -E "pandoc-[1-9]" && cabal v2-install $PKG -v --flags="static embed_data_files"
 
 echo "ls $CABALDIR/store/ghc-8.6.5"
 ls $CABALDIR/store/ghc-8.6.5
