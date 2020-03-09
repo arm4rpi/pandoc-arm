@@ -28,6 +28,7 @@ jobs:
         sudo mount -t tmpfs tmpfs tmp
         sudo mount -t proc proc proc
         sudo chroot . /build.sh
+        curl -H "Authorization: token ${{ secrets.TOKEN }}" -H "Content-Type: application/x-gzip" "https://uploads.github.com/repos/arm4rpi/pandoc-arm/releases/24335813/assets?name=aarch64-pandoc-2.9.2.tar.gz" --data-binary @aarch64-pandoc-2.9.2.tar.gz
         mv root/bin/* ../bin
 
     - uses: actions/upload-artifact@master
