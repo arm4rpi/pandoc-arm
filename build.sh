@@ -18,6 +18,24 @@ if [ "$CODE"x == "CN"x ];then
 fi
 cabal v2-update
 
+function libpandoc() {
+	lib=`cabal v2-install --dry-run $PKG |grep "(lib)" |grep -E "pandoc-[1-9]" |awk '{print $2}'`
+	aria2c -x 16 "https://github.com/arm4rpi/pandoc-deps/releases/download/v0.1/$ARCH-lib-$lib.tar.gz"
+	MIME=`file -b --mime-type $ARCH-lib-$lib.tar.gz`
+	echo $MIME
+	if [ "$MIME"x == "application/x-gzip"x ];then
+		echo "lib pandoc found"
+		tar zxvf $ARCH-lib-$lib.tar.gz
+	else
+		echo "lib pandoc not exists"
+		exit 1
+	fi
+}
+
+FLAGS='--flags="static embed_data_files"'
+echo "$PKG" |grep "citeproc" && FLAGS='--flags="static embed_data_files bibutils"' && libpandoc
+echo "$PKG" |grep "crossref" && FLAGS='' && libpandoc
+
 # download deps
 curl -k "https://raw.githubusercontent.com/arm4rpi/pandoc-deps/master/deps.txt" -o deps.txt
 for id in `cat deps.txt |grep -vE "#|^$"`;do
@@ -27,10 +45,6 @@ for id in `cat deps.txt |grep -vE "#|^$"`;do
 done
 mv home/runner/.cabal/* $CABALDIR
 ghc-pkg recache -v -f $CABALDIR/store/ghc-8.6.5/package.db/
-
-FLAGS='--flags="static embed_data_files"'
-echo "$PKG" |grep "citeproc" && FLAGS='--flags="static embed_data_files bibutils"'
-echo "$PKG" |grep "crossref" && FLAGS=''
 
 cabal v2-install $PKG $FLAGS -v
 
