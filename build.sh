@@ -6,7 +6,7 @@ ARCH=`arch`
 BINDIR=/root/bin
 
 apt-get update
-apt-get install -y cabal-install git curl
+apt-get install -y cabal-install git curl aria2
 
 [ ! -d $BINDIR ] && mkdir $BINDIR
 
@@ -38,7 +38,7 @@ cabal v2-update
 curl "https://raw.githubusercontent.com/arm4rpi/pandoc-deps/master/deps.txt" -o deps.txt
 for id in `cat deps.txt |grep -vE "#|^$"`;do
 	echo "$ARCH-$id.tar.gz"
-	curl -L -s "https://github.com/arm4rpi/pandoc-deps/releases/download/v0.1/$ARCH-$id.tar.gz" -o $ARCH-$id.tar.gz
+	aria2c -x 16 "https://github.com/arm4rpi/pandoc-deps/releases/download/v0.1/$ARCH-$id.tar.gz"
 	tar zxvf $ARCH-$id.tar.gz
 done
 mv home/runner/.cabal/* /home/runner/.cabal
@@ -48,14 +48,14 @@ git clone https://github.com/jgm/pandoc
 cd pandoc
 
 # cabal v2-build --dependencies-only . pandoc-citeproc
-cabal v2-install . pandoc-citeproc --flags="static embed_data_files bibutils -unicode_collation" --bindir=$BINDIR
+cabal v2-build . pandoc-citeproc --flags="static embed_data_files bibutils -unicode_collation" --bindir=$BINDIR
 find /root -name "pandoc"
 find /root -name "pandoc-citeproc"
 cd ../
 
 git clone https://github.com/lierdakil/pandoc-crossref
 cd pandoc-crossref
-cabal v2-install . pandoc-crossref --flags="static" --bindir=$BINDIR
+cabal v2-build . pandoc-crossref --flags="static" --bindir=$BINDIR
 find /root -name "pandoc-crossref"
 cd ../
 
