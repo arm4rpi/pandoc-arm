@@ -21,7 +21,7 @@ mkdir -p /home/runner/.cabal/store/ghc-8.6.5/package.db
 
 function libpandoc() {
 	lib=`cabal v2-install --dry-run $PKG |grep "(lib)" |grep -E "pandoc-[1-9]" |awk '{print $2}'`
-	curl -s -L "https://github.com/arm4rpi/pandoc-deps/releases/download/v0.1/$ARCH-lib-$lib.tar.gz" -o $ARCH-lib-$lib.tar.gz
+	curl -s -L "https://github.com/arm4rpi/pandoc-arm/releases/download/v0.1/$ARCH-lib-$lib.tar.gz" -o $ARCH-lib-$lib.tar.gz
 	MIME=`file -b --mime-type $ARCH-lib-$lib.tar.gz`
 	echo $MIME
 	if [ "$MIME"x == "application/x-gzip"x ];then
