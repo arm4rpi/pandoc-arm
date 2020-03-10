@@ -16,6 +16,7 @@ if [ "$CODE"x == "CN"x ];then
 	sed -i -r 's/hackage.haskell.org\//mirrors.tuna.tsinghua.edu.cn\/hackage/g' $CABALDIR/config
 	sed -i -r 's/hackage.haskell.org/mirrors.tuna.tsinghua.edu.cn/g' $CABALDIR/config
 fi
+echo "# Run cabal v2-update"
 cabal v2-update
 
 echo "Run mkdir package.db"
@@ -40,27 +41,29 @@ libpandoc
 # download deps
 curl -k "https://raw.githubusercontent.com/arm4rpi/pandoc-deps/master/deps.txt" -o deps.txt
 for id in `cat deps.txt |grep -vE "#|^$"`;do
-	echo "$ARCH-$id.tar.gz"
+	echo "# Run Download dep $ARCH-$id.tar.gz"
 	aria2c -x 16 "https://github.com/arm4rpi/pandoc-deps/releases/download/v0.1/$ARCH-$id.tar.gz"
 	tar zxvf $ARCH-$id.tar.gz
 done
 ghc-pkg recache -v -f $CABALDIR/store/ghc-8.6.5/package.db/
 
+echo "# Run cabal v2-install $PKG"
 echo $PKG |grep "citeproc" && cabal v2-install $PKG --flags="static embed_data_files bibutils"
 echo $PKG |grep "crossref" && cabal v2-install $PKG
 echo $PKG |grep -E "pandoc-[1-9]" && cabal v2-install $PKG --flags="static embed_data_files"
 
-echo "ls $CABALDIR/store/ghc-8.6.5 |grep $PKG"
+echo "# Run ls $CABALDIR/store/ghc-8.6.5 |grep $PKG"
 ls $CABALDIR/store/ghc-8.6.5 |grep "$PKG"
 
-echo "ls $CABALDIR/bin"
+echo "# Run ls $CABALDIR/bin"
 ls $CABALDIR/bin
 
-echo "mkdir $PKG"
+echo "# Run mkdir $PKG"
 mkdir $PKG
 cp -L $CABALDIR/bin/* $PKG/$PKG-$ARCH
-echo "strip $PKG-$ARCH"
+echo "# Run strip $PKG-$ARCH"
 strip $PKG/$PKG-$ARCH
 
+echo "# Run tar $PKG $ARCH"
 tar zcvf $ARCH-$PKG.tar.gz $PKG
 echo $PKG |grep -E "pandoc-[1-9]" && tar zcvf $ARCH-lib-$PKG.tar.gz $CABALDIR/store/ghc-8.6.5/$PKG-*
