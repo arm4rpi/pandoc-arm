@@ -5,6 +5,7 @@ set -e
 ARCH=`arch`
 PKG=`basename $0`
 CABALDIR="/home/runner/.cabal"
+BIN="pandoc"
 
 apt-get update
 apt-get install -y cabal-install pkg-config build-essential zlib1g-dev curl aria2 git file binutils
@@ -19,7 +20,7 @@ fi
 echo "# Run cabal v2-update"
 cabal v2-update
 
-echo "Run mkdir package.db"
+echo "# Run mkdir package.db"
 mkdir -p /home/runner/.cabal/store/ghc-8.6.5/package.db
 
 function libpandoc() {
@@ -48,8 +49,8 @@ done
 ghc-pkg recache -v -f $CABALDIR/store/ghc-8.6.5/package.db/
 
 echo "# Run cabal v2-install $PKG"
-echo $PKG |grep "citeproc" && cabal v2-install $PKG --flags="static embed_data_files bibutils"
-echo $PKG |grep "crossref" && cabal v2-install $PKG
+echo $PKG |grep "citeproc" && BIN="pandoc-citeproc" && cabal v2-install $PKG --flags="static embed_data_files bibutils"
+echo $PKG |grep "crossref" && BIN="pandoc-crossref" && cabal v2-install $PKG
 echo $PKG |grep -E "pandoc-[1-9]" && cabal v2-install $PKG --flags="static embed_data_files"
 
 echo "# Run ls $CABALDIR/store/ghc-8.6.5 |grep $PKG"
@@ -58,8 +59,9 @@ ls $CABALDIR/store/ghc-8.6.5 |grep "$PKG"
 echo "# Run ls $CABALDIR/bin"
 ls $CABALDIR/bin
 
-echo "# Run mkdir /release/$PKG"
-cp -L $CABALDIR/bin/* $PKG-$ARCH
+ls -l $CABALDIR/bin/*
+echo "# Copy binary"
+find $CABALDIR/store/ghc-8.6.5/$PKG-* -type f -name "$BIN" -exec cp {} $PKG-$ARCH \;
 echo "# Run strip $PKG-$ARCH"
 strip $PKG-$ARCH
 
