@@ -17,6 +17,8 @@ if [ "$CODE"x == "CN"x ];then
 	sed -i -r 's/hackage.haskell.org/mirrors.tuna.tsinghua.edu.cn/g' $CABALDIR/config
 fi
 cabal v2-update
+
+echo "Run mkdir package.db"
 mkdir -p /home/runner/.cabal/store/ghc-8.6.5/package.db
 
 function libpandoc() {
@@ -24,7 +26,7 @@ function libpandoc() {
 	curl -s -L "https://github.com/arm4rpi/pandoc-arm/releases/download/v0.1/$ARCH-lib-$lib.tar.gz" -o $ARCH-lib-$lib.tar.gz
 	MIME=`file -b --mime-type $ARCH-lib-$lib.tar.gz`
 	echo $MIME
-	if [ "$MIME"x == "application/x-gzip"x ];then
+	if [ "$MIME"x == "application/gzip"x ];then
 		echo "lib pandoc found"
 		tar zxvf $ARCH-lib-$lib.tar.gz
 	else
@@ -33,7 +35,7 @@ function libpandoc() {
 	fi
 }
 
-
+echo "# Run libpandoc"
 libpandoc
 # download deps
 curl -k "https://raw.githubusercontent.com/arm4rpi/pandoc-deps/master/deps.txt" -o deps.txt
