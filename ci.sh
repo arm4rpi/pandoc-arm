@@ -35,6 +35,11 @@ function addJob() {
         MIME=\`file -b --mime-type rootfs/$arch-\$pkg.tar.gz\`
         echo \$MIME
         [ "\$MIME"x == "application/gzip"x ] && echo "Already exists" && exit 0 || echo "Not exists"
+        sudo dd if=/dev/zero of=/mnt/swapfile bs=1M count=10240
+        sudo mkswap /mnt/swapfile
+        sudo swapon /mnt/swapfile
+        free -m
+        df -h
         sudo apt-get update
         sudo apt-get install -y qemu-user-static aria2
         aria2c -x 16 http://cdimage.ubuntu.com/ubuntu-base/releases/19.10/release/ubuntu-base-19.10-base-$ubuntuarch.tar.gz
