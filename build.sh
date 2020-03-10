@@ -7,7 +7,7 @@ PKG=`basename $0`
 CABALDIR="/home/runner/.cabal"
 
 apt-get update
-apt-get install -y cabal-install pkg-config build-essential zlib1g-dev curl aria2 git file
+apt-get install -y cabal-install pkg-config build-essential zlib1g-dev curl aria2 git file binutils
 
 CODE=`curl -s http://ip-api.com/json |tr ',' '\n' |grep "countryCode" |awk -F'"' '{print $4}'`
 cabal user-config init
@@ -48,11 +48,17 @@ echo $PKG |grep "citeproc" && cabal v2-install $PKG --flags="static embed_data_f
 echo $PKG |grep "crossref" && cabal v2-install $PKG
 echo $PKG |grep -E "pandoc-[1-9]" && cabal v2-install $PKG --flags="static embed_data_files"
 
-echo "ls $CABALDIR/store/ghc-8.6.5"
-ls $CABALDIR/store/ghc-8.6.5
+echo "ls $CABALDIR/store/ghc-8.6.5 |grep $PKG"
+ls $CABALDIR/store/ghc-8.6.5 |grep "$PKG"
 
 echo "ls $CABALDIR/bin"
 ls $CABALDIR/bin
 
-tar zcvf $ARCH-$PKG.tar.gz $CABALDIR/bin
+echo "mkdir $PKG"
+mkdir $PKG
+cp -L $CABALDIR/bin/* $PKG/$PKG-$ARCH
+echo "strip $PKG-$ARCH"
+strip $PKG/$PKG-$ARCH
+
+tar zcvf $ARCH-$PKG.tar.gz $PKG
 echo $PKG |grep -E "pandoc-[1-9]" && tar zcvf $ARCH-lib-$PKG.tar.gz $CABALDIR/store/ghc-8.6.5/$PKG-*
