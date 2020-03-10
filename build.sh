@@ -58,12 +58,11 @@ ls $CABALDIR/store/ghc-8.6.5 |grep "$PKG"
 echo "# Run ls $CABALDIR/bin"
 ls $CABALDIR/bin
 
-echo "# Run mkdir $PKG"
-mkdir $PKG
-cp -L $CABALDIR/bin/* $PKG/$PKG-$ARCH
+echo "# Run mkdir /release/$PKG"
+cp -L $CABALDIR/bin/* $PKG-$ARCH
 echo "# Run strip $PKG-$ARCH"
-strip $PKG/$PKG-$ARCH
+strip $PKG-$ARCH
 
 echo "# Run tar $PKG $ARCH"
-tar zcvf $ARCH-$PKG.tar.gz $PKG
+tar zcvf $ARCH-$PKG.tar.gz $PKG-$ARCH
 echo $PKG |grep -E "pandoc-[1-9]" && tar zcvf $ARCH-lib-$PKG.tar.gz $CABALDIR/store/ghc-8.6.5/$PKG-*
