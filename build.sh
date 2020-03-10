@@ -17,6 +17,7 @@ if [ "$CODE"x == "CN"x ];then
 	sed -i -r 's/hackage.haskell.org/mirrors.tuna.tsinghua.edu.cn/g' $CABALDIR/config
 fi
 cabal v2-update
+mkdir -p /home/runner/.cabal/store/ghc-8.6.5/package.db
 
 function libpandoc() {
 	lib=`cabal v2-install --dry-run $PKG |grep "(lib)" |grep -E "pandoc-[1-9]" |awk '{print $2}'`
