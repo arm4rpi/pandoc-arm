@@ -6,6 +6,7 @@ ARCH=`arch`
 PKG=`basename $0`
 CABALDIR="/home/runner/.cabal"
 BIN="pandoc"
+PANDOCLIB="no"
 
 apt-get update
 apt-get install -y cabal-install pkg-config build-essential zlib1g-dev curl aria2 git file binutils
@@ -31,6 +32,7 @@ function libpandoc() {
 	if [ "$MIME"x == "application/gzip"x ];then
 		echo "lib pandoc found"
 		tar zxvf $ARCH-lib-$lib.tar.gz
+		PANDOCLIB="yes"
 	else
 		echo "lib pandoc not exists"
 		echo "$PKG" |grep -E "pandoc-[1-9]" && echo "build pandoc lib" || exit 1
@@ -57,9 +59,10 @@ echo "# Run ls $CABALDIR/store/ghc-8.6.5 |grep $PKG"
 ls $CABALDIR/store/ghc-8.6.5 |grep "$PKG"
 
 echo "# Run ls $CABALDIR/bin"
-ls $CABALDIR/bin
+ls -l $CABALDIR/bin
+echo "# Run ls .local/bin"
+ls -l /home/runner/.local/bin
 
-ls -l $CABALDIR/bin/*
 echo "# Copy binary"
 find $CABALDIR/store/ghc-8.6.5/$PKG-* -type f -name "$BIN" -exec cp {} $PKG-$ARCH \;
 echo "# Run strip $PKG-$ARCH"
@@ -67,4 +70,7 @@ strip $PKG-$ARCH
 
 echo "# Run tar $PKG $ARCH"
 tar zcvf $ARCH-$PKG.tar.gz $PKG-$ARCH
-echo $PKG |grep -E "pandoc-[1-9]" && tar zcvf $ARCH-lib-$PKG.tar.gz $CABALDIR/store/ghc-8.6.5/$PKG-*
+
+if [ "$BIN"x == "pandoc"x ] && [ "$PANDOCLIB"x == "no"x ];then
+	tar zcvf $ARCH-lib-$PKG.tar.gz $CABALDIR/store/ghc-8.6.5/$PKG-*
+fi
