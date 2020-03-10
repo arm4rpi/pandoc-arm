@@ -7,11 +7,13 @@ ITEMS=("pandoc" "pandoc-citeproc" "pandoc-crossref")
 [ ! -d $CIDIR ] && mkdir -p $CIDIR
 
 for id in ${ITEMS[@]};do
-	cat > $CIDIR/${id}.yml <<EOF
-name: $id 
+	for ARCH in aarch64 armv7l;do
+		cat > $CIDIR/${id}-${ARCH}.yml <<EOF
+name: $id-$ARCH 
 on: [push]
 jobs:
 EOF
+	done
 done
 
 function addJob() {
@@ -21,7 +23,7 @@ function addJob() {
 	ubuntuarch=arm64
 	[ "$arch"x == "armv7l"x ] && qemuarch="arm" && ubuntuarch="armhf"
 
-	cat >> $CIDIR/${id}.yml <<EOF
+	cat >> $CIDIR/${id}-${arch}.yml <<EOF
 
   $arch-$id:
     runs-on: ubuntu-latest
