@@ -7,7 +7,7 @@ PKG=`basename $0`
 CABALDIR="/home/runner/.cabal"
 
 apt-get update
-apt-get install -y cabal-install pkg-config build-essential zlib1g-dev curl aria2 git 1>/dev/null
+apt-get install -y cabal-install pkg-config build-essential zlib1g-dev curl aria2 git file 1>/dev/null
 
 CODE=`curl -s http://ip-api.com/json |tr ',' '\n' |grep "countryCode" |awk -F'"' '{print $4}'`
 cabal user-config init
