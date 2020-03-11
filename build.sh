@@ -25,13 +25,17 @@ echo "# Run mkdir package.db"
 mkdir -p /home/runner/.cabal/store/ghc-8.6.5/package.db
 
 function libpandoc() {
+	echo "# Run cabal v2-install dry run $PKG"
 	lib=`cabal v2-install --dry-run $PKG |grep "(lib)" |grep -E "pandoc-[1-9]" |awk '{print $2}'`
-	curl -s -L "https://github.com/arm4rpi/pandoc-arm/releases/download/v0.1/$ARCH-lib-$lib.tar.gz" -o $ARCH-lib-$lib.tar.gz
+	echo "# Run download pandoc lib"
+	# ubuntu 19.10 armv7l will exit code 60 with SSL certificate problem: unable to get local issuer certificate
+	curl -k -s -L "https://github.com/arm4rpi/pandoc-arm/releases/download/v0.1/$ARCH-lib-$lib.tar.gz" -o $ARCH-lib-$lib.tar.gz
+	echo "# Run check mime"
 	MIME=`file -b --mime-type $ARCH-lib-$lib.tar.gz`
 	echo $MIME
 	if [ "$MIME"x == "application/gzip"x ];then
 		echo "lib pandoc found"
-		tar zxvf $ARCH-lib-$lib.tar.gz
+		tar zxf $ARCH-lib-$lib.tar.gz
 		PANDOCLIB="yes"
 	else
 		echo "lib pandoc not exists"
@@ -46,7 +50,7 @@ curl -k "https://raw.githubusercontent.com/arm4rpi/pandoc-deps/master/deps.txt" 
 for id in `cat deps.txt |grep -vE "#|^$"`;do
 	echo "# Run Download dep $ARCH-$id.tar.gz"
 	aria2c -x 16 "https://github.com/arm4rpi/pandoc-deps/releases/download/v0.1/$ARCH-$id.tar.gz"
-	tar zxvf $ARCH-$id.tar.gz
+	tar zxf $ARCH-$id.tar.gz
 done
 ghc-pkg recache -v -f $CABALDIR/store/ghc-8.6.5/package.db/
 
@@ -72,5 +76,7 @@ echo "# Run tar $PKG $ARCH"
 tar zcvf $ARCH-$PKG.tar.gz $PKG-$ARCH
 
 if [ "$BIN"x == "pandoc"x ] && [ "$PANDOCLIB"x == "no"x ];then
-	tar zcvf $ARCH-lib-$PKG.tar.gz $CABALDIR/store/ghc-8.6.5/$PKG-*
+	tar cvf $ARCH-lib-$PKG.tar $CABALDIR/store/ghc-8.6.5/$PKG-*
+	tar rvf $ARCH-lib-$PKG.tar $CABALDIR/store/ghc-8.6.5/package.db/$PKG-*
+	gzip $ARCH-lib-$PKG.tar
 fi
