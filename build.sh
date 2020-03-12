@@ -58,7 +58,7 @@ ghc-pkg recache -v -f $CABALDIR/store/ghc-8.6.5/package.db/
 echo "# Run cabal v2-install $PKG"
 echo $PKG |grep "citeproc" && BIN="pandoc-citeproc" && cabal v2-install $PKG --flags="static embed_data_files bibutils" -v -j1
 echo $PKG |grep "crossref" && BIN="pandoc-crossref" && cabal v2-install $PKG -v -j1
-echo $PKG |grep -E "pandoc-[1-9]" && cabal v2-install $PKG --flags="static embed_data_files" -v -j1 --ghc-options="$RTS"
+echo $PKG |grep -E "pandoc-[1-9]" && cabal v2-install $PKG --flags="static embed_data_files" -v -j1
 
 echo "# Run ls $CABALDIR/store/ghc-8.6.5 |grep $PKG"
 ls $CABALDIR/store/ghc-8.6.5 |grep "$PKG"
