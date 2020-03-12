@@ -7,7 +7,7 @@ PKG=`basename $0`
 CABALDIR="/home/runner/.cabal"
 BIN="pandoc"
 PANDOCLIB="no"
-RTS="+RTS -M7G -A64m -RTS"
+RTS="+RTS -M3500m -A64m -RTS"
 
 apt-get update
 apt-get install -y cabal-install pkg-config build-essential zlib1g-dev curl aria2 git file binutils
