@@ -39,6 +39,7 @@ function libpandoc() {
 		tar zxf $ARCH-lib-$lib.tar.gz
 		PANDOCLIB="yes"
 	else
+		rm -f $ARCH-lib-$lib.tar.gz
 		echo "lib pandoc not exists"
 		echo "$PKG" |grep -E "pandoc-[1-9]" && echo "build pandoc lib" || exit 1
 	fi
