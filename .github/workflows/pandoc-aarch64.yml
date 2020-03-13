@@ -30,15 +30,15 @@ jobs:
         tar xvf ../ubuntu-base-19.10-base-arm64.tar.gz &>/dev/null && echo "decompression rootfs successfull"
         cp /usr/bin/qemu-aarch64-static usr/bin
         cp /etc/resolv.conf etc
-        cp ../build.sh $pkg
+        cp ../build.sh ${pkg}
         sudo mount -t devtmpfs devtmpfs dev
         sudo mount -t devpts devpts dev/pts
         sudo mount -t sysfs sysfs sys
         sudo mount -t tmpfs tmpfs tmp
         sudo mount -t proc proc proc
         echo "chroot to arm"
-        sudo chroot . /$pkg
+        sudo chroot . /${pkg}
         echo "Upload Asset"
-        curl -H "Authorization: token ${{ secrets.TOKEN }}" -H "Content-Type: application/x-gzip" "https://uploads.github.com/repos/arm4rpi/pandoc-arm/releases/24024627/assets?name=aarch64-$pkg.tar.gz" --data-binary @aarch64-$pkg.tar.gz
-        echo "Upload aarch64-lib-$pkg"
-        [ -f aarch64-lib-$pkg.tar.gz ] && curl -H "Authorization: token ${{ secrets.TOKEN }}" -H "Content-Type: application/x-gzip" "https://uploads.github.com/repos/arm4rpi/pandoc-arm/releases/24024627/assets?name=aarch64-lib-$pkg.tar.gz" --data-binary @aarch64-lib-$pkg.tar.gz
+        for id in `ls aarch64-*.tar.gz`;do
+        curl -H "Authorization: token ${{ secrets.TOKEN }}" -H "Content-Type: application/x-gzip" "https://uploads.github.com/repos/arm4rpi/pandoc-arm/releases/24024627/assets?name=$id" --data-binary @$id
+        done

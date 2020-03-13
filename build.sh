@@ -8,6 +8,9 @@ CABALDIR="/home/runner/.cabal"
 BIN="pandoc"
 PANDOCLIB="no"
 RTS="+RTS -M3500m -A64m -RTS"
+DEP=""
+
+echo "$PKG" |grep dep && DEP="--dependencies-only" && PKG=`echo $PKG|sed 's/\-dep//g'`
 
 apt-get update
 apt-get install -y cabal-install pkg-config build-essential zlib1g-dev curl aria2 git file binutils
@@ -27,19 +30,20 @@ mkdir -p /home/runner/.cabal/store/ghc-8.6.5/package.db
 
 function libpandoc() {
 	echo "# Run cabal v2-install dry run $PKG"
-	lib=`cabal v2-install --dry-run $PKG |grep "(lib)" |grep -E "pandoc-[1-9]" |awk '{print $2}'`
+	lib=`cabal v2-install --dry-run $PKG -v |grep -E "include pandoc-[1-9]" |tail -n1 |awk '{print $NF}'`
+	libfile="$ARCH-$lib.tar.gz"
 	echo "# Run download pandoc lib"
 	# ubuntu 19.10 armv7l will exit code 60 with SSL certificate problem: unable to get local issuer certificate
-	curl -k -s -L "https://github.com/arm4rpi/pandoc-arm/releases/download/v0.1/$ARCH-lib-$lib.tar.gz" -o $ARCH-lib-$lib.tar.gz
+	curl -k -s -L "https://github.com/arm4rpi/pandoc-arm/releases/download/v0.1/$libfile" -o $libfile
 	echo "# Run check mime"
-	MIME=`file -b --mime-type $ARCH-lib-$lib.tar.gz`
+	MIME=`file -b --mime-type $libfile`
 	echo $MIME
 	if [ "$MIME"x == "application/gzip"x ];then
 		echo "lib pandoc found"
-		tar zxf $ARCH-lib-$lib.tar.gz
+		tar zxf $libfile
 		PANDOCLIB="yes"
 	else
-		rm -f $ARCH-lib-$lib.tar.gz
+		rm -f $libfile
 		echo "lib pandoc not exists"
 		echo "$PKG" |grep -E "pandoc-[1-9]" && echo "build pandoc lib" || exit 1
 	fi
@@ -57,8 +61,8 @@ done
 ghc-pkg recache -v -f $CABALDIR/store/ghc-8.6.5/package.db/
 
 echo "# Run cabal v2-install $PKG"
-echo $PKG |grep "citeproc" && BIN="pandoc-citeproc" && cabal v2-install $PKG --flags="static embed_data_files bibutils" -v -j1
-echo $PKG |grep "crossref" && BIN="pandoc-crossref" && cabal v2-install $PKG -v -j1
+echo $PKG |grep "citeproc" && BIN="pandoc-citeproc" && cabal v2-install $PKG --flags="static embed_data_files bibutils" -v -j1 $DEP
+echo $PKG |grep "crossref" && BIN="pandoc-crossref" && cabal v2-install $PKG -v -j1 $DEP
 echo $PKG |grep -E "pandoc-[1-9]" && r=0 || r=1
 if [ $r -eq 0 ];then
 	if [ "$ARCH"x == "armv7l"x ];then
@@ -74,16 +78,16 @@ ls $CABALDIR/store/ghc-8.6.5 |grep "$PKG"
 echo "# Run ls $CABALDIR/bin"
 ls -l $CABALDIR/bin
 
-echo "# Copy binary"
-find $CABALDIR/store/ghc-8.6.5/$PKG-* -type f -name "$BIN" -exec cp {} $PKG-$ARCH \;
-echo "# Run strip $PKG-$ARCH"
-strip $PKG-$ARCH
+if [ "$DEP"x == "yes"x ] && [ "$PANDOCLIB"x == "no"x ];then
+	tar cvf $ARCH-$lib.tar $CABALDIR/store/ghc-8.6.5/$lib
+	tar rvf $ARCH-$lib.tar $CABALDIR/store/ghc-8.6.5/package.db/${lib}.conf
+	gzip $ARCH-$lib.tar
+else
+	echo "# Copy binary"
+	find $CABALDIR/store/ghc-8.6.5/$PKG-* -type f -name "$BIN" -exec cp {} $PKG-$ARCH \;
+	echo "# Run strip $PKG-$ARCH"
+	strip $PKG-$ARCH
 
-echo "# Run tar $PKG $ARCH"
-tar zcvf $ARCH-$PKG.tar.gz $PKG-$ARCH
-
-if [ "$BIN"x == "pandoc"x ] && [ "$PANDOCLIB"x == "no"x ];then
-	tar cvf $ARCH-lib-$PKG.tar $CABALDIR/store/ghc-8.6.5/$PKG-*
-	tar rvf $ARCH-lib-$PKG.tar $CABALDIR/store/ghc-8.6.5/package.db/$PKG-*
-	gzip $ARCH-lib-$PKG.tar
+	echo "# Run tar $PKG $ARCH"
+	tar zcvf $ARCH-$PKG.tar.gz $PKG-$ARCH
 fi

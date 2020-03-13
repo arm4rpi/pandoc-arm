@@ -1,15 +1,15 @@
-name: pandoc-citeproc-aarch64 
+name: pandoc-crossref-dep-aarch64 
 on: [push]
 jobs:
 
-  aarch64-pandoc-citeproc:
+  aarch64-pandoc-crossref-dep:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
     - name: build
       run: |
         mkdir rootfs
-        export pkg=`curl -s "http://hackage.haskell.org/package/pandoc-citeproc" |grep "base href" |awk -F'"' '{print $2}' |sed 's/\/$//g' |awk -F'/' '{print $NF}'`
+        export pkg=`curl -s "http://hackage.haskell.org/package/pandoc-crossref" |grep "base href" |awk -F'"' '{print $2}' |sed 's/\/$//g' |awk -F'/' '{print $NF}'`
         curl -s -L "https://github.com/arm4rpi/pandoc-arm/releases/download/v0.1/aarch64-$pkg.tar.gz" -o rootfs/aarch64-$pkg.tar.gz
         MIME=`file -b --mime-type rootfs/aarch64-$pkg.tar.gz`
         echo $MIME
@@ -30,14 +30,14 @@ jobs:
         tar xvf ../ubuntu-base-19.10-base-arm64.tar.gz &>/dev/null && echo "decompression rootfs successfull"
         cp /usr/bin/qemu-aarch64-static usr/bin
         cp /etc/resolv.conf etc
-        cp ../build.sh ${pkg}
+        cp ../build.sh ${pkg}-dep
         sudo mount -t devtmpfs devtmpfs dev
         sudo mount -t devpts devpts dev/pts
         sudo mount -t sysfs sysfs sys
         sudo mount -t tmpfs tmpfs tmp
         sudo mount -t proc proc proc
         echo "chroot to arm"
-        sudo chroot . /${pkg}
+        sudo chroot . /${pkg}-dep
         echo "Upload Asset"
         for id in `ls aarch64-*.tar.gz`;do
         curl -H "Authorization: token ${{ secrets.TOKEN }}" -H "Content-Type: application/x-gzip" "https://uploads.github.com/repos/arm4rpi/pandoc-arm/releases/24024627/assets?name=$id" --data-binary @$id
