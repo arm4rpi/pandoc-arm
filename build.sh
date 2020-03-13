@@ -45,7 +45,7 @@ function libpandoc() {
 	else
 		rm -f $libfile
 		echo "lib pandoc not exists"
-		echo "$PKG" |grep -E "pandoc-[1-9]" && echo "build pandoc lib" || exit 1
+		[ "$DEP"x != ""x ] && echo "build pandoc lib" || exit 1
 	fi
 }
 
