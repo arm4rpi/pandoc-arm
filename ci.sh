@@ -41,7 +41,7 @@ function addJob() {
         echo \$MIME
         [ "\$MIME"x == "application/gzip"x ] && echo "Already exists" && exit 0 || echo "Not exists"
         sudo dd if=/dev/zero of=/mnt/swapfile bs=1M count=12288
-        sudo dd if=/dev/zero of=/home/swapfile bs=1M count=8192
+        sudo dd if=/dev/zero of=/home/swapfile bs=1M count=10240
         sudo mkswap /mnt/swapfile
         sudo mkswap /home/swapfile
         sudo swapon /mnt/swapfile

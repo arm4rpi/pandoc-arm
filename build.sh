@@ -65,11 +65,7 @@ echo $PKG |grep "citeproc" && BIN="pandoc-citeproc" && cabal v2-install $PKG --f
 echo $PKG |grep "crossref" && BIN="pandoc-crossref" && cabal v2-install $PKG -v -j1 $DEP
 echo $PKG |grep -E "pandoc-[1-9]" && r=0 || r=1
 if [ $r -eq 0 ];then
-	if [ "$ARCH"x == "armv7l"x ];then
-		cabal install $PKG --flags="static embed_data_files" -v -j1 --ghc-options="$RTS"
-	else
-		cabal v2-install $PKG --flags="static embed_data_files" -v -j1
-	fi
+	cabal v2-install $PKG --flags="static embed_data_files" -v -j1
 fi
 
 echo "# Run ls $CABALDIR/store/ghc-8.6.5 |grep $PKG"
