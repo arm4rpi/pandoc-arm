@@ -11,6 +11,8 @@ RTS="+RTS -M3500m -A64m -RTS"
 DEP=""
 
 echo "$PKG" |grep dep && DEP="--dependencies-only" && PKG=`echo $PKG|sed 's/\-dep//g'`
+echo "$PKG" |grep "citeproc" && BIN="pandoc-citeproc"
+echo "$PKG" |grep "crossref" && BIN="pandoc-crossref"
 
 apt-get update
 apt-get install -y cabal-install pkg-config build-essential zlib1g-dev curl aria2 git file binutils
@@ -45,7 +47,11 @@ function libpandoc() {
 	else
 		rm -f $libfile
 		echo "lib pandoc not exists"
-		[ "$DEP"x != ""x ] && echo "build pandoc lib" || exit 1
+		if [ "$DEP"x != ""x ] || [ "$BIN"x == "pandoc"x ];then
+			echo "build pandoc lib"
+		else
+			exit 1
+		fi
 	fi
 }
 
@@ -61,12 +67,9 @@ done
 ghc-pkg recache -v -f $CABALDIR/store/ghc-8.6.5/package.db/
 
 echo "# Run cabal v2-install $PKG"
-echo $PKG |grep "citeproc" && BIN="pandoc-citeproc" && cabal v2-install $PKG --flags="static embed_data_files bibutils" -v -j1 $DEP
-echo $PKG |grep "crossref" && BIN="pandoc-crossref" && cabal v2-install $PKG -v -j1 $DEP
-echo $PKG |grep -E "pandoc-[1-9]" && r=0 || r=1
-if [ $r -eq 0 ];then
-	cabal v2-install $PKG --flags="static embed_data_files" -v -j1
-fi
+[ "$BIN"x == "pandoc-citeproc"x ] && cabal v2-install $PKG --flags="static embed_data_files bibutils" -v -j1 $DEP
+[ "$BIN"x == "pandoc-crossref"x ] && cabal v2-install $PKG -v -j1 $DEP
+[ "$BIN"x == "pandoc"x ] && cabal v2-install $PKG --flags="static embed_data_files" -v -j1
 
 echo "# Run ls $CABALDIR/store/ghc-8.6.5 |grep $PKG"
 ls $CABALDIR/store/ghc-8.6.5 |grep "$PKG"

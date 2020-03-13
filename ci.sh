@@ -2,7 +2,7 @@
 
 CIDIR=".github/workflows"
 HACKAGE="http://hackage.haskell.org/package"
-ITEMS=("pandoc" "pandoc-citeproc" "pandoc-crossref" "pandoc-citeproc-dep" "pandoc-crossref-dep")
+ITEMS=("pandoc" "pandoc-citeproc" "pandoc-crossref" "pandoc-citeproc-dep")
 
 [ ! -d $CIDIR ] && mkdir -p $CIDIR
 
