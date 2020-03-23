@@ -10,6 +10,10 @@ RELEASE="https://github.com/arm4rpi/pandoc-arm/releases/download/v0.1"
 LIB="no"
 VERSION="2.9.2"
 GHC="$CABALDIR/store/ghc-8.6.5"
+BUILD=/build
+
+[ ! -d $BUILD ] && mkdir $BUILD
+mv cabal.project* $BUILD
 
 echo "$PKG" |grep "citeproc" && BIN="pandoc-citeproc"
 echo "$PKG" |grep "crossref" && BIN="pandoc-crossref"
@@ -26,9 +30,7 @@ if [ "$CODE"x == "CN"x ];then
 fi
 echo "# Run cabal v2-update"
 
-cd /tmp/
 cabal v2-update
-cd /
 
 echo "# Run mkdir package.db"
 mkdir -p /home/runner/.cabal/store/ghc-8.6.5/package.db
@@ -40,7 +42,7 @@ function _binary() {
 	strip $PKG-$ARCH
 
 	echo "# Run tar $PKG $ARCH"
-	tar zcvf $ARCH-$PKG.tar.gz $PKG-$ARCH
+	tar zcvf /$ARCH-$PKG.tar.gz $PKG-$ARCH
 }
 
 function _lib() {
@@ -75,9 +77,9 @@ function pandoc() {
 	source ./dep.sh
 
 	if [ "$DEP"x != ""x ];then
-		tar zcvf $ARCH-pandoc-deps-$VERSION.tar.gz $GHC
+		tar zcvf /$ARCH-pandoc-deps-$VERSION.tar.gz $GHC
 	else
-		tar zcvf $ARCH-libpandoc-$VERSION.tar.gz $GHC
+		tar zcvf /$ARCH-libpandoc-$VERSION.tar.gz $GHC
 		_binary
 	fi
 }
@@ -93,6 +95,7 @@ function citeproc() {
 	_binary
 }
 
+cd $BUILD
 cabal unpack pandoc pandoc-citeproc pandoc-crossref
 sed "s/^constraints: /cabal v2-install -v $PKG --constraint '/;s/^ \+/--constraint '/;s/,\$/' \\\\/;\$s/\$/'/" cabal.project.freeze > install.sh
 echo "# Run cabal v2-install $PKG"

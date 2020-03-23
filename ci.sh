@@ -53,7 +53,7 @@ function addJob() {
         tar xvf ../ubuntu-base-19.10-base-$ubuntuarch.tar.gz &>/dev/null && echo "decompression rootfs successfull"
         cp /usr/bin/qemu-$qemuarch-static usr/bin
         cp /etc/resolv.conf etc
-        cp ../build.sh \${pkg}.sh
+        cp ../build.sh \${pkg}
         cp ../cabal.project* .
         sudo mount -t devtmpfs devtmpfs dev
         sudo mount -t devpts devpts dev/pts
@@ -61,7 +61,7 @@ function addJob() {
         sudo mount -t tmpfs tmpfs tmp
         sudo mount -t proc proc proc
         echo "chroot to arm"
-        sudo chroot . /\${pkg}.sh
+        sudo chroot . /\${pkg}
         echo "Upload Asset"
         for id in \`ls $arch-*.tar.gz\`;do
         curl -H "Authorization: token \${{ secrets.TOKEN }}" -H "Content-Type: application/x-gzip" "https://uploads.github.com/repos/arm4rpi/pandoc-arm/releases/24024627/assets?name=\$id" --data-binary @\$id
