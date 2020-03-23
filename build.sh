@@ -25,8 +25,10 @@ if [ "$CODE"x == "CN"x ];then
 	sed -i -r 's/hackage.haskell.org/mirrors.tuna.tsinghua.edu.cn/g' $CABALDIR/config
 fi
 echo "# Run cabal v2-update"
-cabal unpack pandoc pandoc-citeproc pandoc-crossref
+
+cd /tmp/
 cabal v2-update
+cd /
 
 echo "# Run mkdir package.db"
 mkdir -p /home/runner/.cabal/store/ghc-8.6.5/package.db
@@ -91,6 +93,7 @@ function citeproc() {
 	_binary
 }
 
+cabal unpack pandoc pandoc-citeproc pandoc-crossref
 sed "s/^constraints: /cabal v2-install -v $PKG --constraint '/;s/^ \+/--constraint '/;s/,\$/' \\\\/;\$s/\$/'/" cabal.project.freeze > install.sh
 echo "# Run cabal v2-install $PKG"
 [ "$BIN"x == "pandoc"x ] && pandoc || citeproc
