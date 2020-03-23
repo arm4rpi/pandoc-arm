@@ -2,7 +2,7 @@
 
 CIDIR=".github/workflows"
 HACKAGE="http://hackage.haskell.org/package"
-ITEMS=("pandoc" "pandoc-citeproc" "pandoc-crossref" "pandoc-citeproc-dep")
+ITEMS=("pandoc" "pandoc-citeproc" "pandoc-crossref")
 
 [ ! -d $CIDIR ] && mkdir -p $CIDIR
 
@@ -57,6 +57,7 @@ function addJob() {
         cp /usr/bin/qemu-$qemuarch-static usr/bin
         cp /etc/resolv.conf etc
         cp ../build.sh \${pkg}${dep}
+        cp ../cabal.project* .
         sudo mount -t devtmpfs devtmpfs dev
         sudo mount -t devpts devpts dev/pts
         sudo mount -t sysfs sysfs sys

@@ -6,11 +6,11 @@ ARCH=`arch`
 PKG=`basename $0`
 CABALDIR="/home/runner/.cabal"
 BIN="pandoc"
-PANDOCLIB="no"
-RTS="+RTS -M3500m -A64m -RTS"
-DEP=""
+RELEASE="https://github.com/arm4rpi/pandoc-arm/releases/download/v0.1"
+LIB="no"
+VERSION="2.9.2"
+GHC="$CABALDIR/store/ghc-8.6.5"
 
-echo "$PKG" |grep dep && DEP="--dependencies-only" && PKG=`echo $PKG|sed 's/\-dep//g'`
 echo "$PKG" |grep "citeproc" && BIN="pandoc-citeproc"
 echo "$PKG" |grep "crossref" && BIN="pandoc-crossref"
 
@@ -30,63 +30,67 @@ cabal v2-update
 echo "# Run mkdir package.db"
 mkdir -p /home/runner/.cabal/store/ghc-8.6.5/package.db
 
-function libpandoc() {
-	echo "# Run cabal v2-install dry run $PKG"
-	lib=`cabal v2-install --dry-run $PKG -v |grep -E "include pandoc-[1-9]" |tail -n1 |awk '{print $NF}'`
-	libfile="$ARCH-$lib.tar.gz"
-	echo "# Run download pandoc lib"
-	# ubuntu 19.10 armv7l will exit code 60 with SSL certificate problem: unable to get local issuer certificate
-	curl -k -s -L "https://github.com/arm4rpi/pandoc-arm/releases/download/v0.1/$libfile" -o $libfile
-	echo "# Run check mime"
-	MIME=`file -b --mime-type $libfile`
-	echo $MIME
-	if [ "$MIME"x == "application/gzip"x ];then
-		echo "lib pandoc found"
-		tar zxf $libfile
-		PANDOCLIB="yes"
-	else
-		rm -f $libfile
-		echo "lib pandoc not exists"
-		if [ "$DEP"x != ""x ] || [ "$BIN"x == "pandoc"x ];then
-			echo "build pandoc lib"
-		else
-			exit 1
-		fi
-	fi
-}
-
-echo "# Run libpandoc"
-libpandoc
-# download deps
-curl -k "https://raw.githubusercontent.com/arm4rpi/pandoc-deps/master/deps.txt" -o deps.txt
-for id in `cat deps.txt |grep -vE "#|^$"`;do
-	echo "# Run Download dep $ARCH-$id.tar.gz"
-	aria2c -x 16 "https://github.com/arm4rpi/pandoc-deps/releases/download/v0.1/$ARCH-$id.tar.gz"
-	tar zxf $ARCH-$id.tar.gz
-done
-ghc-pkg recache -v -f $CABALDIR/store/ghc-8.6.5/package.db/
-
-echo "# Run cabal v2-install $PKG"
-[ "$BIN"x == "pandoc-citeproc"x ] && cabal v2-install $PKG --flags="static embed_data_files bibutils" -v -j1 $DEP
-[ "$BIN"x == "pandoc-crossref"x ] && cabal v2-install $PKG -v -j1 $DEP
-[ "$BIN"x == "pandoc"x ] && cabal v2-install $PKG --flags="static embed_data_files" -v -j1
-
-echo "# Run ls $CABALDIR/store/ghc-8.6.5 |grep $PKG"
-ls $CABALDIR/store/ghc-8.6.5 |grep "$PKG"
-
-echo "# Run ls $CABALDIR/bin"
-ls -l $CABALDIR/bin
-
-if [ "$DEP"x == "yes"x ] && [ "$PANDOCLIB"x == "no"x ];then
-	tar cvf $ARCH-$lib.tar $CABALDIR/store/ghc-8.6.5/$lib
-	tar rvf $ARCH-$lib.tar $CABALDIR/store/ghc-8.6.5/package.db/${lib}.conf
-	gzip $ARCH-$lib.tar
-else
+function _binary() {
 	echo "# Copy binary"
-	find $CABALDIR/store/ghc-8.6.5/$PKG-* -type f -name "$BIN" -exec cp {} $PKG-$ARCH \;
+	find $GHC/$PKG-* -type f -name "$BIN" -exec cp {} $PKG-$ARCH \;
 	echo "# Run strip $PKG-$ARCH"
 	strip $PKG-$ARCH
 
 	echo "# Run tar $PKG $ARCH"
 	tar zcvf $ARCH-$PKG.tar.gz $PKG-$ARCH
-fi
+}
+
+function _lib() {
+	echo "# Run download $1"
+	# ubuntu 19.10 armv7l will exit code 60 with SSL certificate problem: unable to get local issuer certificate
+	libfile=$ARCH-$1.tar.gz
+	curl -k -s -L "$RELEASE/$libfile" -o $libfile
+	echo "# Run check mime"
+	MIME=`file -b --mime-type $libfile`
+	echo $MIME
+	if [ "$MIME"x == "application/gzip"x ];then
+		echo "$libfile found"
+		tar zxf $libfile
+		LIB="yes"
+		ghc-pkg recache -v -f $GHC/package.db/
+	else
+		rm -f $libfile
+		echo "$libfile not exists"
+	fi
+}
+
+
+function pandoc() {
+	# pandoc deps
+	_lib pandoc-deps-$VERSION
+	DEP=""
+	if [ "$LIB"x == "no"x ];then
+		DEP="--dependencies-only"
+	fi
+	
+	sed "s/^constraints: /cabal v2-install -v $DEP $PKG --constraint '/;s/^ \+/--constraint '/;s/,\$/' \\\\/;\$s/\$/'/" cabal.project.freeze > dep.sh
+	source ./dep.sh
+
+	if [ "$DEP"x != ""x ];then
+		tar zcvf $ARCH-pandoc-deps-$VERSION.tar.gz $GHC
+	else
+		tar zcvf $ARCH-libpandoc-$VERSION.tar.gz $GHC
+		_binary
+	fi
+}
+
+function citeproc() {
+	# libpandoc
+	_lib libpandoc-$VERSION
+	if [ "$LIB"x == "no"x ];then
+		echo "libpandoc not ready"
+		exit 1
+	fi
+	source ./install.sh
+	_binary
+}
+
+cabal unpack pandoc pandoc-citeproc pandoc-crossref
+sed "s/^constraints: /cabal v2-install -v $PKG --constraint '/;s/^ \+/--constraint '/;s/,\$/' \\\\/;\$s/\$/'/" cabal.project.freeze > install.sh
+echo "# Run cabal v2-install $PKG"
+[ "$BIN"x == "pandoc"x ] && pandoc || citeproc

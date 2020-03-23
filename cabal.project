@@ -1,0 +1,12 @@
+packages: pandoc-2.9.2 pandoc-citeproc-0.17 pandoc-crossref-0.3.6.2
+package pandoc
+  flags: +embed_data_files -trypandoc +static
+  ghc-options: -j +RTS -A64m -RTS
+
+package pandoc-citeproc
+  flags: +embed_data_files +bibutils -unicode_collation -test_citeproc -debug +static
+  ghc-options: -j +RTS -A64m -RTS
+
+package pandoc-crossref
+  flags: +static
+  ghc-options: -j +RTS -A64m -RTS

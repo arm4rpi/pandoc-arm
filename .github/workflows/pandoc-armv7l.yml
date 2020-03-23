@@ -31,6 +31,7 @@ jobs:
         cp /usr/bin/qemu-arm-static usr/bin
         cp /etc/resolv.conf etc
         cp ../build.sh ${pkg}
+        cp ../cabal.project* .
         sudo mount -t devtmpfs devtmpfs dev
         sudo mount -t devpts devpts dev/pts
         sudo mount -t sysfs sysfs sys
